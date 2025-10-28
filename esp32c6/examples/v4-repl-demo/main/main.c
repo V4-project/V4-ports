@@ -21,7 +21,7 @@
 #define LINE_BUF_SIZE 256
 
 // VM configuration
-#define ARENA_SIZE (16 * 1024)  // 16KB arena for VM
+#define ARENA_SIZE (16 * 1024) // 16KB arena for VM
 
 static char line_buf[LINE_BUF_SIZE];
 static int line_pos = 0;
@@ -39,6 +39,7 @@ static void print_banner(void)
   printf("Forth Interactive Shell\n");
   printf("Type Forth code and press Enter\n");
   printf("Arena Size: %d bytes\n", ARENA_SIZE);
+  printf("System: %s\n", v4_hal_system_info());
   printf("========================================\n\n");
 }
 
@@ -123,7 +124,7 @@ void app_main(void)
 
   // Initialize UART
   v4_err err = v4_hal_uart_init(UART_PORT, UART_BAUDRATE);
-  if (err != V4_ERR_OK)
+  if (err != 0)
   {
     printf("ERROR: Failed to initialize UART (error %d)\n", err);
     return;
@@ -160,57 +161,51 @@ void app_main(void)
   // Main REPL loop
   while (1)
   {
-    // Check for available UART data
-    int available;
-    err = v4_hal_uart_available(UART_PORT, &available);
+    // Try to read a character (non-blocking)
+    char c;
+    err = v4_hal_uart_getc(UART_PORT, &c);
 
-    if (err == V4_ERR_OK && available > 0)
+    if (err == 0)
     {
-      char c;
-      int read_len;
-      err = v4_hal_uart_read(UART_PORT, &c, 1, &read_len);
-
-      if (err == V4_ERR_OK && read_len > 0)
+      // Character received
+      // Handle newline (Enter key)
+      if (c == '\n' || c == '\r')
       {
-        // Handle newline (Enter key)
-        if (c == '\n' || c == '\r')
-        {
-          line_buf[line_pos] = '\0';
+        line_buf[line_pos] = '\0';
 
-          // Process the line
-          if (line_pos > 0)
-          {
-            process_line(vm, ctx, line_buf);
-          }
+        // Process the line
+        if (line_pos > 0)
+        {
+          process_line(vm, ctx, line_buf);
+        }
 
-          // Reset line buffer
-          line_pos = 0;
+        // Reset line buffer
+        line_pos = 0;
 
-          // Print new prompt
-          printf("v4> ");
-          fflush(stdout);
-        }
-        // Handle backspace/delete
-        else if (c == 0x08 || c == 0x7F)
+        // Print new prompt
+        printf("v4> ");
+        fflush(stdout);
+      }
+      // Handle backspace/delete
+      else if (c == 0x08 || c == 0x7F)
+      {
+        handle_backspace();
+      }
+      // Handle Ctrl+C (reset line)
+      else if (c == 0x03)
+      {
+        line_pos = 0;
+        printf("^C\nv4> ");
+        fflush(stdout);
+      }
+      // Handle normal characters
+      else if (c >= 0x20 && c < 0x7F)
+      {
+        if (line_pos < LINE_BUF_SIZE - 1)
         {
-          handle_backspace();
-        }
-        // Handle Ctrl+C (reset line)
-        else if (c == 0x03)
-        {
-          line_pos = 0;
-          printf("^C\nv4> ");
-          fflush(stdout);
-        }
-        // Handle normal characters
-        else if (c >= 0x20 && c < 0x7F)
-        {
-          if (line_pos < LINE_BUF_SIZE - 1)
-          {
-            line_buf[line_pos++] = c;
-            // Echo character back
-            v4_hal_uart_write(UART_PORT, &c, 1);
-          }
+          line_buf[line_pos++] = c;
+          // Echo character back
+          v4_hal_uart_putc(UART_PORT, c);
         }
       }
     }

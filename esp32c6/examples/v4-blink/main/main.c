@@ -27,11 +27,12 @@ void app_main(void)
   printf("========================================\n");
   printf("LED Pin: GPIO%d\n", LED_PIN);
   printf("Blink Interval: %d ms\n", BLINK_INTERVAL_MS);
+  printf("System: %s\n", v4_hal_system_info());
   printf("========================================\n\n");
 
   // Initialize GPIO pin for LED output
-  v4_err err = v4_hal_gpio_set_mode(LED_PIN, V4_GPIO_MODE_OUTPUT);
-  if (err != V4_ERR_OK)
+  v4_err err = v4_hal_gpio_init(LED_PIN, V4_HAL_GPIO_MODE_OUTPUT);
+  if (err != 0)
   {
     printf("ERROR: Failed to initialize GPIO%d (error code: %d)\n", LED_PIN, err);
     return;
@@ -47,19 +48,13 @@ void app_main(void)
   {
     // Toggle LED state
     err = v4_hal_gpio_write(LED_PIN, state);
-    if (err != V4_ERR_OK)
+    if (err != 0)
     {
       printf("ERROR: Failed to write GPIO%d\n", LED_PIN);
     }
 
     // Get current time
-    uint32_t current_ms;
-    err = v4_hal_millis(&current_ms);
-    if (err != V4_ERR_OK)
-    {
-      printf("ERROR: Failed to get current time\n");
-      current_ms = 0;
-    }
+    uint32_t current_ms = v4_hal_millis();
 
     // Print status
     printf("[%6" PRIu32 "] LED %s | Time: %" PRIu32 " ms\n", loop_count,
@@ -70,10 +65,6 @@ void app_main(void)
     loop_count++;
 
     // Wait before next toggle
-    err = v4_hal_delay_ms(BLINK_INTERVAL_MS);
-    if (err != V4_ERR_OK)
-    {
-      printf("ERROR: Failed to delay\n");
-    }
+    v4_hal_delay_ms(BLINK_INTERVAL_MS);
   }
 }

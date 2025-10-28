@@ -11,37 +11,37 @@
 #include "v4_hal_esp32c6.h"
 
 // Default UART configuration
-#define UART_PORT_NUM UART_NUM_0  // USB-CDC on ESP32-C6
+#define UART_PORT_NUM UART_NUM_0 // USB-CDC on ESP32-C6
 #define UART_BUF_SIZE 1024
 #define UART_RX_BUF_SIZE (UART_BUF_SIZE * 2)
-#define UART_TX_BUF_SIZE 0  // No TX buffer (blocking)
+#define UART_TX_BUF_SIZE 0 // No TX buffer (blocking)
 
 static bool uart_initialized = false;
 
 /**
- * @brief Initialize UART peripheral
+ * @brief Initialize a UART port
  *
  * @param port UART port number (0-1 for ESP32-C6)
  * @param baudrate Baud rate (e.g., 115200)
- * @return V4_ERR_OK on success, error code otherwise
+ * @return 0 on success, negative error code on failure
  */
 v4_err v4_hal_uart_init(int port, int baudrate)
 {
   if (port < 0 || port >= UART_NUM_MAX)
   {
-    return V4_ERR_INVALID_ARG;
+    return -1; // Invalid argument
   }
 
   if (baudrate <= 0)
   {
-    return V4_ERR_INVALID_ARG;
+    return -1; // Invalid argument
   }
 
   // Skip re-initialization
   if (uart_initialized)
   {
     printf("UART already initialized, skipping\n");
-    return V4_ERR_OK;
+    return 0; // Success
   }
 
   uart_config_t uart_config = {
@@ -60,7 +60,7 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_param_config failed: %s\n", esp_err_to_name(err));
-    return V4_ERR_IO;
+    return -2; // IO error
   }
 
   // Set UART pins (use default pins for UART0/USB-CDC)
@@ -69,7 +69,7 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_set_pin failed: %s\n", esp_err_to_name(err));
-    return V4_ERR_IO;
+    return -2; // IO error
   }
 
   // Install UART driver
@@ -78,124 +78,122 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_driver_install failed: %s\n", esp_err_to_name(err));
-    return V4_ERR_IO;
+    return -2; // IO error
   }
 
   uart_initialized = true;
   printf("UART initialized: port=%d, baudrate=%d\n", port, baudrate);
 
-  return V4_ERR_OK;
+  return 0; // Success
 }
 
 /**
- * @brief Write data to UART
+ * @brief Send a single character via UART
  *
  * @param port UART port number
- * @param data Data buffer to write
- * @param len Length of data to write
- * @return V4_ERR_OK on success, error code otherwise
+ * @param c Character to send
+ * @return 0 on success, negative error code on failure
  */
-v4_err v4_hal_uart_write(int port, const char *data, int len)
+v4_err v4_hal_uart_putc(int port, char c)
 {
-  if (!data || len <= 0)
+  if (!uart_initialized)
   {
-    return V4_ERR_INVALID_ARG;
+    return -3; // Not ready
+  }
+
+  int written = uart_write_bytes(UART_PORT_NUM, &c, 1);
+  if (written != 1)
+  {
+    return -2; // IO error
+  }
+
+  return 0; // Success
+}
+
+/**
+ * @brief Receive a single character from UART
+ *
+ * @param port UART port number
+ * @param out_c Pointer to store the received character
+ * @return 0 on success, negative error code if no data or error
+ */
+v4_err v4_hal_uart_getc(int port, char *out_c)
+{
+  if (!out_c)
+  {
+    return -1; // Invalid argument
   }
 
   if (!uart_initialized)
   {
-    return V4_ERR_NOT_READY;
+    return -3; // Not ready
   }
 
-  int written = uart_write_bytes(UART_PORT_NUM, data, len);
+  // Non-blocking read (timeout = 0)
+  int len = uart_read_bytes(UART_PORT_NUM, (uint8_t *)out_c, 1, 0);
+  if (len <= 0)
+  {
+    return -4; // No data available
+  }
+
+  return 0; // Success
+}
+
+/**
+ * @brief Send a buffer via UART
+ *
+ * @param port UART port number
+ * @param buf Pointer to data buffer
+ * @param len Number of bytes to send
+ * @return 0 on success, negative error code on failure
+ */
+v4_err v4_hal_uart_write(int port, const char *buf, int len)
+{
+  if (!buf || len <= 0)
+  {
+    return -1; // Invalid argument
+  }
+
+  if (!uart_initialized)
+  {
+    return -3; // Not ready
+  }
+
+  int written = uart_write_bytes(UART_PORT_NUM, buf, len);
   if (written != len)
   {
     printf("ERROR: uart_write_bytes failed: expected %d, wrote %d\n", len, written);
-    return V4_ERR_IO;
+    return -2; // IO error
   }
 
-  return V4_ERR_OK;
+  return 0; // Success
 }
 
 /**
- * @brief Read data from UART (non-blocking)
+ * @brief Receive data from UART
  *
  * @param port UART port number
- * @param buf Buffer to store read data
- * @param max_len Maximum length to read
- * @param read_len Pointer to store actual read length
- * @return V4_ERR_OK on success, error code otherwise
+ * @param buf Pointer to destination buffer
+ * @param max_len Maximum number of bytes to read
+ * @param out_len Pointer to store actual bytes read
+ * @return 0 on success, negative error code on failure
  */
-v4_err v4_hal_uart_read(int port, char *buf, int max_len, int *read_len)
+v4_err v4_hal_uart_read(int port, char *buf, int max_len, int *out_len)
 {
-  if (!buf || !read_len || max_len <= 0)
+  if (!buf || !out_len || max_len <= 0)
   {
-    return V4_ERR_INVALID_ARG;
+    return -1; // Invalid argument
   }
 
   if (!uart_initialized)
   {
-    *read_len = 0;
-    return V4_ERR_NOT_READY;
+    *out_len = 0;
+    return -3; // Not ready
   }
 
   // Non-blocking read (timeout = 0)
   int len = uart_read_bytes(UART_PORT_NUM, (uint8_t *)buf, max_len, 0);
-  *read_len = (len >= 0) ? len : 0;
+  *out_len = (len >= 0) ? len : 0;
 
-  return V4_ERR_OK;
-}
-
-/**
- * @brief Get number of bytes available in UART RX buffer
- *
- * @param port UART port number
- * @param count Pointer to store available byte count
- * @return V4_ERR_OK on success, error code otherwise
- */
-v4_err v4_hal_uart_available(int port, int *count)
-{
-  if (!count)
-  {
-    return V4_ERR_INVALID_ARG;
-  }
-
-  if (!uart_initialized)
-  {
-    *count = 0;
-    return V4_ERR_NOT_READY;
-  }
-
-  size_t available;
-  esp_err_t err = uart_get_buffered_data_len(UART_PORT_NUM, &available);
-  if (err != ESP_OK)
-  {
-    *count = 0;
-    return V4_ERR_IO;
-  }
-
-  *count = (int)available;
-  return V4_ERR_OK;
-}
-
-/**
- * @brief Flush UART TX buffer
- *
- * @param port UART port number
- * @return V4_ERR_OK on success, error code otherwise
- */
-v4_err v4_hal_uart_flush(int port)
-{
-  if (!uart_initialized)
-  {
-    return V4_ERR_NOT_READY;
-  }
-
-  esp_err_t err = uart_wait_tx_done(UART_PORT_NUM, portMAX_DELAY);
-  if (err != ESP_OK)
-  {
-    return V4_ERR_IO;
-  }
-
-  return V4_ERR_OK;
+  return 0; // Success
 }

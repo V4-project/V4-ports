@@ -5,6 +5,7 @@ idf_component_register(
   "src/hal_gpio.c"
   "src/hal_uart.c"
   "src/hal_timer.c"
+  "src/hal_system.c"
   INCLUDE_DIRS
   "include"
   PRIV_REQUIRES
