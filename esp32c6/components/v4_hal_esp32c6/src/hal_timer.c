@@ -44,7 +44,7 @@ void v4_hal_delay_ms(uint32_t ms)
   TickType_t ticks = pdMS_TO_TICKS(ms);
   if (ticks == 0 && ms > 0)
   {
-    ticks = 1; // Minimum 1 tick delay
+    ticks = 1;  // Minimum 1 tick delay
   }
   vTaskDelay(ticks);
 }

@@ -21,7 +21,7 @@
 #define LINE_BUF_SIZE 256
 
 // VM configuration
-#define ARENA_SIZE (16 * 1024) // 16KB arena for VM
+#define ARENA_SIZE (16 * 1024)  // 16KB arena for VM
 
 static char line_buf[LINE_BUF_SIZE];
 static int line_pos = 0;

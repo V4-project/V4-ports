@@ -11,10 +11,10 @@
 #include "v4_hal_esp32c6.h"
 
 // Default UART configuration
-#define UART_PORT_NUM UART_NUM_0 // USB-CDC on ESP32-C6
+#define UART_PORT_NUM UART_NUM_0  // USB-CDC on ESP32-C6
 #define UART_BUF_SIZE 1024
 #define UART_RX_BUF_SIZE (UART_BUF_SIZE * 2)
-#define UART_TX_BUF_SIZE 0 // No TX buffer (blocking)
+#define UART_TX_BUF_SIZE 0  // No TX buffer (blocking)
 
 static bool uart_initialized = false;
 
@@ -29,19 +29,19 @@ v4_err v4_hal_uart_init(int port, int baudrate)
 {
   if (port < 0 || port >= UART_NUM_MAX)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   if (baudrate <= 0)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   // Skip re-initialization
   if (uart_initialized)
   {
     printf("UART already initialized, skipping\n");
-    return 0; // Success
+    return 0;  // Success
   }
 
   uart_config_t uart_config = {
@@ -60,7 +60,7 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_param_config failed: %s\n", esp_err_to_name(err));
-    return -2; // IO error
+    return -2;  // IO error
   }
 
   // Set UART pins (use default pins for UART0/USB-CDC)
@@ -69,7 +69,7 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_set_pin failed: %s\n", esp_err_to_name(err));
-    return -2; // IO error
+    return -2;  // IO error
   }
 
   // Install UART driver
@@ -78,13 +78,13 @@ v4_err v4_hal_uart_init(int port, int baudrate)
   if (err != ESP_OK)
   {
     printf("ERROR: uart_driver_install failed: %s\n", esp_err_to_name(err));
-    return -2; // IO error
+    return -2;  // IO error
   }
 
   uart_initialized = true;
   printf("UART initialized: port=%d, baudrate=%d\n", port, baudrate);
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -98,16 +98,16 @@ v4_err v4_hal_uart_putc(int port, char c)
 {
   if (!uart_initialized)
   {
-    return -3; // Not ready
+    return -3;  // Not ready
   }
 
   int written = uart_write_bytes(UART_PORT_NUM, &c, 1);
   if (written != 1)
   {
-    return -2; // IO error
+    return -2;  // IO error
   }
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -121,22 +121,22 @@ v4_err v4_hal_uart_getc(int port, char *out_c)
 {
   if (!out_c)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   if (!uart_initialized)
   {
-    return -3; // Not ready
+    return -3;  // Not ready
   }
 
   // Non-blocking read (timeout = 0)
   int len = uart_read_bytes(UART_PORT_NUM, (uint8_t *)out_c, 1, 0);
   if (len <= 0)
   {
-    return -4; // No data available
+    return -4;  // No data available
   }
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -151,22 +151,22 @@ v4_err v4_hal_uart_write(int port, const char *buf, int len)
 {
   if (!buf || len <= 0)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   if (!uart_initialized)
   {
-    return -3; // Not ready
+    return -3;  // Not ready
   }
 
   int written = uart_write_bytes(UART_PORT_NUM, buf, len);
   if (written != len)
   {
     printf("ERROR: uart_write_bytes failed: expected %d, wrote %d\n", len, written);
-    return -2; // IO error
+    return -2;  // IO error
   }
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -182,18 +182,18 @@ v4_err v4_hal_uart_read(int port, char *buf, int max_len, int *out_len)
 {
   if (!buf || !out_len || max_len <= 0)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   if (!uart_initialized)
   {
     *out_len = 0;
-    return -3; // Not ready
+    return -3;  // Not ready
   }
 
   // Non-blocking read (timeout = 0)
   int len = uart_read_bytes(UART_PORT_NUM, (uint8_t *)buf, max_len, 0);
   *out_len = (len >= 0) ? len : 0;
 
-  return 0; // Success
+  return 0;  // Success
 }

@@ -20,7 +20,7 @@ v4_err v4_hal_gpio_init(int pin, v4_hal_gpio_mode mode)
 {
   if (pin < 0 || pin >= GPIO_NUM_MAX)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   gpio_config_t io_conf = {
@@ -51,17 +51,17 @@ v4_err v4_hal_gpio_init(int pin, v4_hal_gpio_mode mode)
       break;
 
     default:
-      return -1; // Invalid mode
+      return -1;  // Invalid mode
   }
 
   esp_err_t err = gpio_config(&io_conf);
   if (err != ESP_OK)
   {
     printf("ERROR: gpio_config failed for pin %d: %s\n", pin, esp_err_to_name(err));
-    return -2; // IO error
+    return -2;  // IO error
   }
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -75,16 +75,16 @@ v4_err v4_hal_gpio_write(int pin, int value)
 {
   if (pin < 0 || pin >= GPIO_NUM_MAX)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   esp_err_t err = gpio_set_level(pin, value ? 1 : 0);
   if (err != ESP_OK)
   {
-    return -2; // IO error
+    return -2;  // IO error
   }
 
-  return 0; // Success
+  return 0;  // Success
 }
 
 /**
@@ -98,16 +98,16 @@ v4_err v4_hal_gpio_read(int pin, int *out_value)
 {
   if (!out_value)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   if (pin < 0 || pin >= GPIO_NUM_MAX)
   {
-    return -1; // Invalid argument
+    return -1;  // Invalid argument
   }
 
   int level = gpio_get_level(pin);
   *out_value = level;
 
-  return 0; // Success
+  return 0;  // Success
 }
