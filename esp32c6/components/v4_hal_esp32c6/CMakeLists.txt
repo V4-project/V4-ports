@@ -12,18 +12,34 @@ idf_component_register(
   esp_timer)
 
 # Add V4 include path if available Users should set V4_PATH to point to V4 directory
-# Example: cmake -DV4_PATH=/path/to/v4 ..
+# Example: export V4_PATH=/path/to/v4 (then run idf.py build)
 if(DEFINED ENV{V4_PATH})
   target_include_directories(${COMPONENT_LIB} PUBLIC "$ENV{V4_PATH}/include")
-  message(STATUS "V4 path: $ENV{V4_PATH}")
+  message(STATUS "V4 path (from V4_PATH): $ENV{V4_PATH}")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../../V4/include")
+  # Local development (uppercase V4)
+  target_include_directories(${COMPONENT_LIB}
+                             PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../../../../V4/include")
+  message(STATUS "V4 found at: ${CMAKE_CURRENT_LIST_DIR}/../../../../V4")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../../v4/include")
+  # CI environment (lowercase v4)
+  target_include_directories(${COMPONENT_LIB}
+                             PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../../../../v4/include")
+  message(STATUS "V4 found at: ${CMAKE_CURRENT_LIST_DIR}/../../../../v4")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../V4/include")
+  # Legacy path (uppercase V4, 3 levels up)
+  target_include_directories(${COMPONENT_LIB}
+                             PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../../../V4/include")
+  message(STATUS "V4 found at: ${CMAKE_CURRENT_LIST_DIR}/../../../V4")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../v4/include")
+  # Legacy path (lowercase v4, 3 levels up)
   target_include_directories(${COMPONENT_LIB}
                              PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../../../v4/include")
   message(STATUS "V4 found at: ${CMAKE_CURRENT_LIST_DIR}/../../../v4")
 else()
   message(
     WARNING
-      "V4 not found. Set V4_PATH environment variable or place v4 at ${CMAKE_CURRENT_LIST_DIR}/../../../v4"
+      "V4 not found. Set V4_PATH environment variable or place V4/v4 at ${CMAKE_CURRENT_LIST_DIR}/../../../../{V4,v4}"
   )
 endif()
 

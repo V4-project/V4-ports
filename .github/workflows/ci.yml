@@ -45,6 +45,9 @@ jobs:
         working-directory: v4-ports/esp32c6/examples/v4-blink
         run: |
           . $IDF_PATH/export.sh
+          export V4_PATH=$GITHUB_WORKSPACE/v4
+          echo "V4_PATH is set to: $V4_PATH"
+          ls -la $V4_PATH/include/v4/ || echo "V4 headers not found"
           idf.py build
 
       # v4-repl-demo requires v4 and v4-front
