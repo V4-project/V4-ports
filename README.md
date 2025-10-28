@@ -4,14 +4,14 @@ Hardware Abstraction Layer (HAL) implementations for V4 VM across various microc
 
 ## Overview
 
-**V4-ports** provides platform-specific HAL implementations that enable V4 VM to run on embedded hardware. Each port implements the HAL API defined in [V4-core](https://github.com/your-org/v4-core).
+**V4-ports** provides platform-specific HAL implementations that enable V4 VM to run on embedded hardware. Each port implements the HAL API defined in [V4](https://github.com/kirisaki/v4).
 
 ### Architecture
 
 ```
 V4-ports (HAL implementation, MCU-specific) ← This repository
     ↓ depends on
-V4-core (VM core, ISA, HAL API contract)
+V4 (VM core, ISA, HAL API contract)
     ↓ depends on
 V4-front (Forth → Bytecode compiler)
 
@@ -49,12 +49,12 @@ V4-repl (Interactive loop, optional)
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/v4-ports.git
+git clone https://github.com/kirisaki/v4-ports.git
 cd v4-ports
 
-# Clone dependencies (v4-core and v4-front)
-git clone https://github.com/your-org/v4-core.git
-git clone https://github.com/your-org/v4-front.git
+# Clone dependencies (v4 and v4-front)
+git clone https://github.com/kirisaki/v4.git
+git clone https://github.com/kirisaki/v4-front.git
 
 # Start Docker container
 docker compose run --rm esp-idf
@@ -74,10 +74,10 @@ idf.py flash monitor
 # See: https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/get-started/
 
 # Clone repository and dependencies
-git clone https://github.com/your-org/v4-ports.git
+git clone https://github.com/kirisaki/v4-ports.git
 cd v4-ports
-git clone https://github.com/your-org/v4-core.git
-git clone https://github.com/your-org/v4-front.git
+git clone https://github.com/kirisaki/v4.git
+git clone https://github.com/kirisaki/v4-front.git
 
 # Setup ESP-IDF environment
 . $IDF_PATH/export.sh
@@ -208,7 +208,7 @@ find components examples -name '*.c' -o -name '*.h' | xargs clang-format -i
 
 ### Adding a New HAL Function
 
-1. Define the function in `v4-core/include/v4/v4_hal.h`
+1. Define the function in `v4/include/v4/v4_hal.h`
 2. Implement it in `esp32c6/components/v4_hal_esp32c6/src/hal_*.c`
 3. Update tests and examples
 4. Run formatting and CI checks
@@ -231,7 +231,7 @@ See `.github/workflows/ci.yml` for details.
 - **Solution**: Run `. $IDF_PATH/export.sh` to setup ESP-IDF environment
 
 **Problem**: `v4/v4_hal.h: No such file or directory`
-- **Solution**: Ensure v4-core is cloned in the parent directory or set `V4_CORE_PATH`
+- **Solution**: Ensure v4 is cloned in the parent directory or set `V4_PATH`
 
 **Problem**: UART not working on ESP32-C6
 - **Solution**: ESP32-C6 uses USB-CDC for UART0. Connect via USB and use the CDC serial port.
@@ -243,7 +243,7 @@ See `.github/workflows/ci.yml` for details.
 
 - ESP-IDF Documentation: https://docs.espressif.com/projects/esp-idf/
 - ESP32-C6 Datasheet: https://www.espressif.com/sites/default/files/documentation/esp32-c6_datasheet_en.pdf
-- V4 Project Issues: https://github.com/your-org/v4-ports/issues
+- V4 Project Issues: https://github.com/kirisaki/v4-ports/issues
 
 ## Contributing
 
@@ -273,9 +273,9 @@ You may choose either license for your use.
 
 ## Related Projects
 
-- [V4-core](https://github.com/your-org/v4-core) - VM core implementation
-- [V4-front](https://github.com/your-org/v4-front) - Forth compiler frontend
-- [V4-repl](https://github.com/your-org/v4-repl) - Interactive REPL
+- [V4](https://github.com/kirisaki/v4) - VM core implementation
+- [V4-front](https://github.com/kirisaki/v4-front) - Forth compiler frontend
+- [V4-repl](https://github.com/kirisaki/v4-repl) - Interactive REPL
 
 ---
 

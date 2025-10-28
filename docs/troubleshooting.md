@@ -24,18 +24,18 @@ fatal error: v4/v4_hal.h: No such file or directory
           ^~~~~~~~~~~~~~
 ```
 
-**Cause**: V4-core not found in expected location.
+**Cause**: V4 not found in expected location.
 
 **Solutions**:
 
-1. **Verify v4-core location**:
+1. **Verify v4 location**:
    ```bash
-   ls ../../../v4-core/include/v4/v4_hal.h
+   ls ../../../v4/include/v4/v4_hal.h
    ```
 
-2. **Set V4_CORE_PATH environment variable**:
+2. **Set V4_PATH environment variable**:
    ```bash
-   export V4_CORE_PATH=/path/to/v4-core
+   export V4_PATH=/path/to/v4
    idf.py build
    ```
 
@@ -43,7 +43,7 @@ fatal error: v4/v4_hal.h: No such file or directory
    ```cmake
    set(EXTRA_COMPONENT_DIRS
        "${CMAKE_CURRENT_LIST_DIR}/../../components"
-       "${CMAKE_CURRENT_LIST_DIR}/../../../v4-core"  # Verify this path
+       "${CMAKE_CURRENT_LIST_DIR}/../../../v4"  # Verify this path
    )
    ```
 
@@ -552,7 +552,7 @@ When reporting bugs, include:
 
 4. **Steps to reproduce**
 
-Submit at: [github.com/your-org/v4-ports/issues](https://github.com/your-org/v4-ports/issues)
+Submit at: [github.com/kirisaki/v4-ports/issues](https://github.com/kirisaki/v4-ports/issues)
 
 ---
 
@@ -560,4 +560,4 @@ Submit at: [github.com/your-org/v4-ports/issues](https://github.com/your-org/v4-
 
 - [ESP-IDF Troubleshooting](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-guides/tools/idf-monitor.html)
 - [ESP32-C6 Forum](https://www.esp32.com/)
-- [V4 Project Issues](https://github.com/your-org/v4-ports/issues)
+- [V4 Project Issues](https://github.com/kirisaki/v4-ports/issues)

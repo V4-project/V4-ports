@@ -19,19 +19,19 @@ jobs:
         with:
           path: v4-ports
 
-      # Note: These steps assume v4-core and v4-front are available
+      # Note: These steps assume v4 and v4-front are available
       # Update the repository paths according to your organization
-      - name: Checkout V4-core
+      - name: Checkout V4
         uses: actions/checkout@v4
         with:
-          repository: your-org/v4-core # TODO: Update this path
-          path: v4-core
+          repository: kirisaki/v4 # TODO: Update this path
+          path: v4
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout V4-front
         uses: actions/checkout@v4
         with:
-          repository: your-org/v4-front # TODO: Update this path
+          repository: kirisaki/v4-front # TODO: Update this path
           path: v4-front
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,13 +47,13 @@ jobs:
           . $IDF_PATH/export.sh
           idf.py build
 
-      # v4-repl-demo requires v4-core and v4-front
+      # v4-repl-demo requires v4 and v4-front
       # Uncomment when dependencies are available
       # - name: Build v4-repl-demo
       #   working-directory: v4-ports/esp32c6/examples/v4-repl-demo
       #   run: |
       #     . $IDF_PATH/export.sh
-      #     export V4_CORE_PATH=$GITHUB_WORKSPACE/v4-core
+      #     export V4_PATH=$GITHUB_WORKSPACE/v4
       #     export V4_FRONT_PATH=$GITHUB_WORKSPACE/v4-front
       #     idf.py build
 

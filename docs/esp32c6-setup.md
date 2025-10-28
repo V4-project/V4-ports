@@ -78,12 +78,12 @@ This guide will help you set up your development environment for ESP32-C6 and ru
 3. **Clone Repository**
 
    ```bash
-   git clone https://github.com/your-org/v4-ports.git
+   git clone https://github.com/kirisaki/v4-ports.git
    cd v4-ports
 
    # Clone dependencies
-   git clone https://github.com/your-org/v4-core.git
-   git clone https://github.com/your-org/v4-front.git
+   git clone https://github.com/kirisaki/v4.git
+   git clone https://github.com/kirisaki/v4-front.git
    ```
 
 4. **Start Container**
@@ -182,8 +182,8 @@ This guide will help you set up your development environment for ESP32-C6 and ru
 1. **Ensure Dependencies are Available**
 
    ```bash
-   # v4-core and v4-front should be in parent directory
-   ls ../../v4-core
+   # v4 and v4-front should be in parent directory
+   ls ../../v4
    ls ../../v4-front
    ```
 
@@ -311,14 +311,14 @@ sudo idf.py flash monitor
 
 ### Issue: Build fails with "v4/v4_hal.h not found"
 
-**Solution**: Ensure v4-core is in the correct location.
+**Solution**: Ensure v4 is in the correct location.
 
 ```bash
 # Check path
-ls ../../../v4-core/include/v4/v4_hal.h
+ls ../../../v4/include/v4/v4_hal.h
 
 # Or set environment variable
-export V4_CORE_PATH=/path/to/v4-core
+export V4_PATH=/path/to/v4
 ```
 
 ### Issue: UART not working
@@ -422,7 +422,7 @@ heap_trace_dump();
 ## Next Steps
 
 - Try the [v4-repl-demo](../esp32c6/examples/v4-repl-demo) for interactive Forth
-- Read [V4 HAL API Documentation](https://github.com/your-org/v4-core/docs/hal-api.md)
+- Read [V4 HAL API Documentation](https://github.com/kirisaki/v4/docs/hal-api.md)
 - Explore [ESP32-C6 Technical Reference Manual](https://www.espressif.com/sites/default/files/documentation/esp32-c6_technical_reference_manual_en.pdf)
 
 ## Additional Resources
@@ -434,4 +434,4 @@ heap_trace_dump();
 
 ---
 
-**Need Help?** Open an issue at [github.com/your-org/v4-ports/issues](https://github.com/your-org/v4-ports/issues)
+**Need Help?** Open an issue at [github.com/kirisaki/v4-ports/issues](https://github.com/kirisaki/v4-ports/issues)

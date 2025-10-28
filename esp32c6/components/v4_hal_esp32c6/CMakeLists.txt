@@ -13,21 +13,21 @@ idf_component_register(
         esp_timer
 )
 
-# Add V4-core include path if available
-# Users should set V4_CORE_PATH to point to V4-core directory
-# Example: cmake -DV4_CORE_PATH=/path/to/v4-core ..
-if(DEFINED ENV{V4_CORE_PATH})
+# Add V4 include path if available
+# Users should set V4_PATH to point to V4 directory
+# Example: cmake -DV4_PATH=/path/to/v4 ..
+if(DEFINED ENV{V4_PATH})
     target_include_directories(${COMPONENT_LIB} PUBLIC
-        "$ENV{V4_CORE_PATH}/include"
+        "$ENV{V4_PATH}/include"
     )
-    message(STATUS "V4-core path: $ENV{V4_CORE_PATH}")
-elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../v4-core/include")
+    message(STATUS "V4 path: $ENV{V4_PATH}")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../v4/include")
     target_include_directories(${COMPONENT_LIB} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/../../../v4-core/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../v4/include"
     )
-    message(STATUS "V4-core found at: ${CMAKE_CURRENT_LIST_DIR}/../../../v4-core")
+    message(STATUS "V4 found at: ${CMAKE_CURRENT_LIST_DIR}/../../../v4")
 else()
-    message(WARNING "V4-core not found. Set V4_CORE_PATH environment variable or place v4-core at ${CMAKE_CURRENT_LIST_DIR}/../../../v4-core")
+    message(WARNING "V4 not found. Set V4_PATH environment variable or place v4 at ${CMAKE_CURRENT_LIST_DIR}/../../../v4")
 endif()
 
 # Compiler options
