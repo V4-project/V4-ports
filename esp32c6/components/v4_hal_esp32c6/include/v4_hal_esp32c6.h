@@ -10,7 +10,8 @@
  */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 // HAL implementation version
@@ -24,4 +25,4 @@ extern "C" {
 }
 #endif
 
-#endif // V4_HAL_ESP32C6_H
+#endif  // V4_HAL_ESP32C6_H
