@@ -10,10 +10,17 @@ services:
     volumes:
       # Mount project directory
       - .:/project
+      # Mount V4 (required for HAL headers)
+      - ../V4:/v4:ro
+      # Mount V4-front (required for REPL example)
+      - ../V4-front:/v4-front:ro
       # Mount SSH keys for git operations (optional)
       - ~/.ssh:/root/.ssh:ro
       # Persistent build cache
       - esp-idf-cache:/root/.espressif
+    environment:
+      # Set V4 path for build system
+      - V4_PATH=/v4
     working_dir: /project
     command: /bin/bash
     tty: true
