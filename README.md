@@ -202,8 +202,30 @@ idf.py fullclean
 Before committing, format your code:
 
 ```bash
-cd esp32c6
-find components examples -name '*.c' -o -name '*.h' | xargs clang-format -i
+# Format all C/C++ and CMake files
+make format
+
+# Check formatting (without modifying files)
+make format-check
+```
+
+**Requirements**:
+- `clang-format` - C/C++ code formatting
+- `cmake-format` - CMake files formatting
+
+**Install tools**:
+```bash
+# Ubuntu/Debian
+sudo apt-get install clang-format
+pip install cmake-format
+
+# macOS
+brew install clang-format
+pip install cmake-format
+
+# Docker (ESP-IDF container)
+pip install cmake-format
+# clang-format is already included
 ```
 
 ### Adding a New HAL Function
@@ -252,8 +274,9 @@ Contributions are welcome! Please:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Format code with `clang-format`
-5. Submit a pull request
+4. Format code with `make format`
+5. Verify formatting with `make format-check`
+6. Submit a pull request
 
 ### Coding Standards
 
