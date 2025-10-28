@@ -1,0 +1,44 @@
+# ESP-IDF build artifacts
+build/
+sdkconfig
+sdkconfig.old
+sdkconfig.defaults.old
+*.bin
+*.elf
+*.map
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+*.egg
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Dependencies (should be managed separately)
+v4-core/
+v4-front/
+v4-repl/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
