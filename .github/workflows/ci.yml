@@ -78,27 +78,31 @@ jobs:
       #       v4-ports/esp32c6/examples/v4-repl-demo/build/*.elf
       #     retention-days: 7
 
-  lint:
-    name: Code Format Check
+  formatting:
+    name: Code Formatting Check
     runs-on: ubuntu-latest
-    container:
-      image: espressif/idf:v5.3
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install formatting tools
+      - name: Install clang-format
         run: |
-          apt-get update
-          apt-get install -y clang-format
-          pip install cmake-format
+          sudo apt-get update
+          sudo apt-get install -y clang-format
 
-      - name: Check code formatting
+      - name: Check C/C++ formatting
         run: |
-          echo "Checking C/C++ formatting..."
-          find esp32c6 -type f \( -name '*.c' -o -name '*.h' \) \
-            -not -path "*/build/*" | xargs clang-format --dry-run --Werror
-          echo "Checking CMake formatting..."
-          find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | xargs cmake-format --check
-          echo "✅ All formatting checks passed!"
+          find esp32c6 -type f \( -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' \) \
+            -not -path "*/build/*" | \
+            xargs clang-format --dry-run --Werror || \
+            (echo "❌ C/C++ formatting check failed. Run 'make format' to fix." && exit 1)
+
+      - name: Install cmake-format
+        run: pip install cmake-format pyyaml
+
+      - name: Check CMake formatting
+        run: |
+          find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | \
+            xargs cmake-format --check || \
+            (echo "❌ CMake formatting check failed. Run 'make format' to fix." && exit 1)
