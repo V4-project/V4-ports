@@ -9,7 +9,7 @@ format:
 	@find esp32c6 -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' -o -name '*.c' \) \
 		-not -path "*/build/*" -exec clang-format -i {} \;
 	@echo "✨ Formatting CMake files..."
-	@find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | xargs cmake-format -i
+	@find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | grep -v '/build/' | xargs cmake-format -i
 	@echo "✅ Formatting complete!"
 
 # Format check (for CI)
@@ -19,7 +19,7 @@ format-check:
 		-not -path "*/build/*" | xargs clang-format --dry-run --Werror || \
 		(echo "❌ C/C++ formatting check failed. Run 'make format' to fix." && exit 1)
 	@echo "🔍 Checking CMake formatting..."
-	@find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | xargs cmake-format --check || \
+	@find esp32c6 -name 'CMakeLists.txt' -o -name '*.cmake' | grep -v '/build/' | xargs cmake-format --check || \
 		(echo "❌ CMake formatting check failed. Run 'make format' to fix." && exit 1)
 	@echo "✅ All formatting checks passed!"
 
