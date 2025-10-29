@@ -1,11 +1,9 @@
 # Docker Compose configuration for ESP32-C6 development
-# Provides ESP-IDF v5.3 development environment
-
-version: '3.8'
+# Provides ESP-IDF v5.5.1 development environment
 
 services:
   esp-idf:
-    image: espressif/idf:v5.3
+    image: espressif/idf:v5.5.1
     container_name: v4-ports-esp-idf
     volumes:
       # Mount project directory
@@ -14,6 +12,8 @@ services:
       - ../V4:/v4:ro
       # Mount V4-front (required for REPL example)
       - ../V4-front:/v4-front:ro
+      # Mount V4-repl (required for REPL example)
+      - ../V4-repl:/v4-repl:ro
       # Mount SSH keys for git operations (optional)
       - ~/.ssh:/root/.ssh:ro
       # Persistent build cache
@@ -21,14 +21,15 @@ services:
     environment:
       # Set V4 path for build system
       - V4_PATH=/v4
+      - V4_FRONT_PATH=/v4-front
+      - V4_REPL_PATH=/v4-repl
     working_dir: /project
     command: /bin/bash
     tty: true
     stdin_open: true
-    # Device access for flashing (optional, uncomment if needed)
-    # devices:
-    #   - /dev/ttyUSB0:/dev/ttyUSB0
-    #   - /dev/ttyACM0:/dev/ttyACM0
+    # Device access for flashing
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
     privileged: false
     network_mode: bridge
 

@@ -106,6 +106,12 @@ idf.py build flash monitor
 - Prints status to serial console
 - Demonstrates GPIO output and timer functions
 
+**Hardware Setup**:
+- Uses on-board LED on **GPIO7** (standard LED)
+- **Note**: GPIO8 is WS2812 RGB LED (requires special driver)
+- No external components required
+- See `esp32c6/examples/v4-blink/README.md` for details
+
 #### 2. v4-repl-demo
 
 Interactive Forth REPL over UART.
@@ -137,25 +143,26 @@ v4>
 The ESP32-C6 port implements the following V4 HAL APIs:
 
 ### GPIO Control
-- `v4_hal_gpio_set_mode()` - Configure pin mode (input/output/pullup)
-- `v4_hal_gpio_write()` - Write digital output
-- `v4_hal_gpio_read()` - Read digital input
-- `v4_hal_gpio_toggle()` - Toggle output state
+- `v4_hal_gpio_init()` - Initialize GPIO pin with mode (input/output/pullup/pulldown)
+- `v4_hal_gpio_write()` - Write digital output (HIGH/LOW)
+- `v4_hal_gpio_read()` - Read digital input state
 
 ### UART Control
-- `v4_hal_uart_init()` - Initialize UART peripheral
-- `v4_hal_uart_write()` - Write data to UART
+- `v4_hal_uart_init()` - Initialize UART peripheral with baud rate
+- `v4_hal_uart_putc()` - Send a single character
+- `v4_hal_uart_getc()` - Receive a single character (non-blocking)
+- `v4_hal_uart_write()` - Write data buffer to UART
 - `v4_hal_uart_read()` - Read data from UART (non-blocking)
-- `v4_hal_uart_available()` - Get available byte count
-- `v4_hal_uart_flush()` - Flush TX buffer
 
 ### Timer Control
-- `v4_hal_delay_ms()` - Millisecond delay
-- `v4_hal_delay_us()` - Microsecond delay
+- `v4_hal_delay_ms()` - Blocking delay in milliseconds
+- `v4_hal_delay_us()` - Blocking delay in microseconds
 - `v4_hal_millis()` - Get milliseconds since boot
 - `v4_hal_micros()` - Get microseconds since boot
-- `v4_hal_get_ticks()` - Get system tick count
-- `v4_hal_get_tick_freq()` - Get tick frequency
+
+### System Control
+- `v4_hal_system_reset()` - Reset the system
+- `v4_hal_system_info()` - Get system information string
 
 ## Directory Structure
 
@@ -170,7 +177,8 @@ v4-ports/
 │   │       └── src/
 │   │           ├── hal_gpio.c
 │   │           ├── hal_uart.c
-│   │           └── hal_timer.c
+│   │           ├── hal_timer.c
+│   │           └── hal_system.c
 │   └── examples/
 │       ├── v4-blink/          # LED blink example
 │       └── v4-repl-demo/      # REPL example

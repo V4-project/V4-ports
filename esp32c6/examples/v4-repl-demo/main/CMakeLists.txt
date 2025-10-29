@@ -8,4 +8,8 @@ idf_component_register(
   REQUIRES
   v4_hal_esp32c6
   v4_core
-  v4_front)
+  v4_front
+  v4_repl
+  PRIV_REQUIRES
+  esp_driver_usb_serial_jtag
+  vfs)

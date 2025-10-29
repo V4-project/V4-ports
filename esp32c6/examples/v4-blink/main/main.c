@@ -11,10 +11,10 @@
 
 #include "v4/v4_hal.h"
 
-// LED pin configuration for ESP32-C6 (NanoC6)
-// Adjust this pin number according to your hardware
-// Common pins: GPIO8 (on-board LED for some boards)
-#define LED_PIN 8
+// LED pin configuration for ESP32-C6
+// GPIO7: Simple on-board LED (can be controlled with standard GPIO)
+// GPIO8: WS2812 RGB LED (requires special driver)
+#define LED_PIN 7
 
 // Blink interval in milliseconds
 #define BLINK_INTERVAL_MS 500
