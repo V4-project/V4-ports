@@ -30,6 +30,7 @@
 #define LED_GPIO 7  // GPIO7 for LED
 
 static uint8_t arena_buf[ARENA_SIZE];
+static int led_state = 0;  // Track LED state for toggle
 
 /**
  * @brief Print welcome banner
@@ -125,7 +126,8 @@ static void process_line(struct Vm *vm, V4FrontContext *ctx, const char *line)
     v4front_err ctx_err = v4front_context_register_word(ctx, word->name, wid);
     if (ctx_err != 0)
     {
-      printf("ERROR: Failed to register word '%s' to compiler (code %ld)\n", word->name, (long)ctx_err);
+      printf("ERROR: Failed to register word '%s' to compiler (code %ld)\n", word->name,
+             (long)ctx_err);
       v4front_free(&buf);
       return;
     }
@@ -304,38 +306,55 @@ void app_main(void)
   }
   printf("Compiler context created\n");
 
-  // Register LED control functions as V4 words using SYS instructions
-  // led-on: 7 1 0x01 SYS RET
+  // Register LED control functions as V4 words using SYS instructions and memory
+  // Use standard GPIO SYS calls (0x01=WRITE) and store state in VM memory at address 0
+
+  // led-on: 1 DUP 0 ! 7 SWAP 0x01 SYS RET
+  // Store 1 to memory[0], then write to GPIO
   static uint8_t led_on_code[] = {
-      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
-      0x74,            // LIT1 (value = 1 = HIGH)
+      0x74,            // LIT1 (value = 1)
+      0x01,            // DUP (keep copy for GPIO write)
+      0x73,            // LIT0 (address 0)
+      0x31,            // STORE (write 1 to memory[0])
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin)
+      0x03,            // SWAP (pin, 1)
       0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
       0x51             // RET
   };
 
-  // led-off: 7 0 0x01 SYS RET
+  // led-off: 0 DUP 0 ! 7 SWAP 0x01 SYS RET
+  // Store 0 to memory[0], then write to GPIO
   static uint8_t led_off_code[] = {
-      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
-      0x73,            // LIT0 (value = 0 = LOW)
+      0x73,            // LIT0 (value = 0)
+      0x01,            // DUP (keep copy for GPIO write)
+      0x73,            // LIT0 (address 0)
+      0x31,            // STORE (write 0 to memory[0])
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin)
+      0x03,            // SWAP (pin, 0)
       0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
       0x51             // RET
   };
 
-  // led-toggle: Read current GPIO state, invert it, and write back
-  // Bytecode: 7 0x02 SYS (GPIO_READ) -> NOT -> 7 SWAP -> 0x01 SYS (GPIO_WRITE) -> RET
+  // led-toggle: 0 @ 1 XOR DUP 0 ! 7 SWAP 0x01 SYS RET
+  // Read from memory[0], XOR with 1, store back, write to GPIO
   static uint8_t led_toggle_code[] = {
-      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
-      0x60, 0x02,      // SYS 0x02 (V4_SYS_GPIO_READ) - reads pin state to stack
-      0x2B,            // INVERT (bitwise NOT)
-      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number again)
-      0x03,            // SWAP (pin, inverted_value)
+      0x73,            // LIT0 (address 0)
+      0x30,            // LOAD (read state from memory[0])
+      0x74,            // LIT1
+      0x2A,            // XOR (toggle: 0→1, 1→0)
+      0x01,            // DUP (keep copy for store and GPIO)
+      0x73,            // LIT0 (address 0)
+      0x31,            // STORE (write new state to memory[0])
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin)
+      0x03,            // SWAP (pin, new_state)
       0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
       0x51             // RET
   };
 
   int wid_on = vm_register_word(vm, "led-on", led_on_code, sizeof(led_on_code));
   int wid_off = vm_register_word(vm, "led-off", led_off_code, sizeof(led_off_code));
-  int wid_toggle = vm_register_word(vm, "led-toggle", led_toggle_code, sizeof(led_toggle_code));
+  int wid_toggle =
+      vm_register_word(vm, "led-toggle", led_toggle_code, sizeof(led_toggle_code));
 
   if (wid_on >= 0 && wid_off >= 0 && wid_toggle >= 0)
   {
