@@ -12,11 +12,11 @@ else()
   # Fetch from GitHub if not found locally
   include(FetchContent)
   message(STATUS "V4-hal not found locally, fetching from GitHub...")
-  FetchContent_Declare(
+  fetchcontent_declare(
     v4_hal_src
     GIT_REPOSITORY https://github.com/V4-project/V4-hal.git
     GIT_TAG main)
-  FetchContent_MakeAvailable(v4_hal_src)
+  fetchcontent_makeavailable(v4_hal_src)
   set(V4_HAL_DIR "${v4_hal_src_SOURCE_DIR}")
   message(STATUS "V4-hal fetched to: ${V4_HAL_DIR}")
 endif()

@@ -1,0 +1,27 @@
+# ESP32-C6 V4-link Demo Default Configuration
+
+# USB Serial/JTAG for communication
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+# Main task stack size (8KB for V4 VM)
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# Enable C++ exceptions (required for port implementation)
+CONFIG_COMPILER_CXX_EXCEPTIONS=y
+
+# Optimize for size
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+
+# Log level
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_LOG_MAXIMUM_LEVEL_VERBOSE=y
+
+# UART configuration
+CONFIG_UART_ISR_IN_IRAM=y
+
+# FreeRTOS
+CONFIG_FREERTOS_HZ=1000
+
+# Memory
+CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP=y

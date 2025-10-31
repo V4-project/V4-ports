@@ -1,0 +1,28 @@
+## IDF Component Manager Manifest File
+version: "0.1.0"
+description: V4-link bytecode transfer layer for V4 VM
+url: https://github.com/V4-project/V4-ports
+repository: https://github.com/V4-project/V4-ports.git
+documentation: https://github.com/V4-project/V4-link
+
+dependencies:
+  idf:
+    version: ">=5.3.0"
+
+  # V4-link will be detected via CMakeLists.txt logic:
+  # 1. V4_LINK_PATH environment variable
+  # 2. Local path (../../../../V4-link)
+  # 3. GitHub FetchContent
+
+maintainers:
+  - Akihito Kirisaki <kirisaki@example.com>
+
+tags:
+  - vm
+  - bytecode
+  - forth
+  - embedded
+  - uart
+  - protocol
+
+license: MIT OR Apache-2.0
