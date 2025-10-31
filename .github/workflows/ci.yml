@@ -93,10 +93,12 @@ jobs:
           . $IDF_PATH/export.sh
           export V4_PATH=$GITHUB_WORKSPACE/v4
           export V4_FRONT_PATH=$GITHUB_WORKSPACE/v4-front
+          export V4_REPL_PATH=$GITHUB_WORKSPACE/v4-repl
           export V4_HAL_PATH=$GITHUB_WORKSPACE/v4-hal
           export V4_LINK_PATH=$GITHUB_WORKSPACE/v4-link
           echo "V4_PATH is set to: $V4_PATH"
           echo "V4_FRONT_PATH is set to: $V4_FRONT_PATH"
+          echo "V4_REPL_PATH is set to: $V4_REPL_PATH"
           echo "V4_HAL_PATH is set to: $V4_HAL_PATH"
           echo "V4_LINK_PATH is set to: $V4_LINK_PATH"
           idf.py build
