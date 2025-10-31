@@ -113,28 +113,9 @@ static void process_line(struct Vm *vm, V4FrontContext *ctx, const char *line)
     return;
   }
 
-  // Handle LED control commands before Forth compilation
-  if (strcmp(line, "led-on") == 0)
+  // Handle "n led!" pattern with special parsing
+  if (strstr(line, "led!") != NULL)
   {
-    led_on_impl(vm);
-    printf("ok\n");
-    return;
-  }
-  else if (strcmp(line, "led-off") == 0)
-  {
-    led_off_impl(vm);
-    printf("ok\n");
-    return;
-  }
-  else if (strcmp(line, "led-toggle") == 0)
-  {
-    led_toggle_impl(vm);
-    printf("ok\n");
-    return;
-  }
-  else if (strncmp(line, "led!", 4) == 0)
-  {
-    // Handle "n led!" pattern
     int value;
     if (sscanf(line, "%d led!", &value) == 1)
     {
@@ -153,16 +134,35 @@ static void process_line(struct Vm *vm, V4FrontContext *ctx, const char *line)
 
   if (err != 0)
   {
-    // Compilation error
-    printf("ERROR: %s\n", error.message);
+    // Compilation error - format with position information
+    char error_buf[512];
+    v4front_format_error(&error, line, error_buf, sizeof(error_buf));
+    printf("%s", error_buf);  // error_buf already contains newlines
     return;
   }
 
-  // Register compiled words to VM
+  // Register compiled words to VM and compiler context
   for (int i = 0; i < buf.word_count; i++)
   {
     V4FrontWord *word = &buf.words[i];
-    vm_register_word(vm, word->name, word->code, (int)word->code_len);
+
+    // Register to VM
+    int wid = vm_register_word(vm, word->name, word->code, (int)word->code_len);
+    if (wid < 0)
+    {
+      printf("ERROR: Failed to register word '%s' (code %d)\n", word->name, wid);
+      v4front_free(&buf);
+      return;
+    }
+
+    // Register to compiler context so it can be used in subsequent compilations
+    v4front_err ctx_err = v4front_context_register_word(ctx, word->name, wid);
+    if (ctx_err != 0)
+    {
+      printf("ERROR: Failed to register word '%s' to compiler (code %ld)\n", word->name, (long)ctx_err);
+      v4front_free(&buf);
+      return;
+    }
   }
 
   // Execute immediate code if any
@@ -336,12 +336,56 @@ void app_main(void)
     printf("ERROR: Failed to create compiler context\n");
     return;
   }
-  printf("Compiler context created\n\n");
+  printf("Compiler context created\n");
+
+  // Register LED control functions as V4 words using SYS instructions
+  // led-on: 7 1 0x01 SYS RET
+  static uint8_t led_on_code[] = {
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
+      0x74,            // LIT1 (value = 1 = HIGH)
+      0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
+      0x51             // RET
+  };
+
+  // led-off: 7 0 0x01 SYS RET
+  static uint8_t led_off_code[] = {
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
+      0x73,            // LIT0 (value = 0 = LOW)
+      0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
+      0x51             // RET
+  };
+
+  // led-toggle: led_state not led_state ! 7 led_state 0x01 SYS RET
+  // For simplicity, we'll keep using C implementation via handle_led_word
+  static uint8_t led_toggle_code[] = {
+      0x51  // RET (handled by handle_led_word)
+  };
+
+  int wid_on = vm_register_word(vm, "led-on", led_on_code, sizeof(led_on_code));
+  int wid_off = vm_register_word(vm, "led-off", led_off_code, sizeof(led_off_code));
+  int wid_toggle = vm_register_word(vm, "led-toggle", led_toggle_code, sizeof(led_toggle_code));
+
+  if (wid_on >= 0 && wid_off >= 0 && wid_toggle >= 0)
+  {
+    // Register to compiler context so they can be used in definitions
+    v4front_context_register_word(ctx, "led-on", wid_on);
+    v4front_context_register_word(ctx, "led-off", wid_off);
+    v4front_context_register_word(ctx, "led-toggle", wid_toggle);
+    printf("LED control words registered\n\n");
+  }
+  else
+  {
+    printf("WARNING: Failed to register LED words\n\n");
+  }
+
   printf("Available LED commands:\n");
-  printf("  led-on    - Turn LED on\n");
-  printf("  led-off   - Turn LED off\n");
+  printf("  led-on     - Turn LED on\n");
+  printf("  led-off    - Turn LED off\n");
   printf("  led-toggle - Toggle LED state\n");
-  printf("  n led!    - Set LED (0=off, non-zero=on)\n\n");
+  printf("  n led!     - Set LED (0=off, non-zero=on)\n");
+  printf("\nYou can now use these in word definitions and control structures:\n");
+  printf("  : blink led-on led-off ;\n");
+  printf("  1 if led-on then\n\n");
 
   // Main REPL loop
   char line[MAX_LINE_LENGTH];
