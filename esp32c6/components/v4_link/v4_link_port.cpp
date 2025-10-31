@@ -8,7 +8,7 @@
 
 #include "v4_link_port.hpp"
 
-#include <stdexcept>
+#include <cassert>
 
 #include "esp_log.h"
 
@@ -21,10 +21,8 @@ Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, uart_port_t uart_num, uint32_t baud_rat
                                  size_t buffer_size, int tx_pin, int rx_pin)
     : uart_num_(uart_num), link_(nullptr)
 {
-  if (vm == nullptr)
-  {
-    throw std::runtime_error("VM pointer is null");
-  }
+  // Assert on null VM pointer (programming error)
+  assert(vm != nullptr && "VM pointer must not be null");
 
   // UART configuration
   uart_config_t uart_config = {
@@ -43,7 +41,7 @@ Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, uart_port_t uart_num, uint32_t baud_rat
   if (ret != ESP_OK)
   {
     ESP_LOGE(TAG, "Failed to install UART driver: %s", esp_err_to_name(ret));
-    throw std::runtime_error("UART driver installation failed");
+    abort();
   }
 
   // Configure UART parameters
@@ -52,7 +50,7 @@ Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, uart_port_t uart_num, uint32_t baud_rat
   {
     ESP_LOGE(TAG, "Failed to configure UART: %s", esp_err_to_name(ret));
     uart_driver_delete(uart_num_);
-    throw std::runtime_error("UART configuration failed");
+    abort();
   }
 
   // Set UART pins (if specified)
@@ -63,7 +61,7 @@ Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, uart_port_t uart_num, uint32_t baud_rat
     {
       ESP_LOGE(TAG, "Failed to set UART pins: %s", esp_err_to_name(ret));
       uart_driver_delete(uart_num_);
-      throw std::runtime_error("UART pin configuration failed");
+      abort();
     }
   }
 
