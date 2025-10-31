@@ -6,7 +6,7 @@ idf_component_register(
   INCLUDE_DIRS
   "."
   REQUIRES
-  v4_hal_esp32c6
+  v4_hal
   v4_core
   v4_front
   v4_repl
