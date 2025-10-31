@@ -40,14 +40,13 @@ idf_component_register(
   driver
   esp_driver_uart)
 
-# Compiler options (Disable error on failed static assertions for ESP-IDF C++17
-# compatibility)
-target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os -Wno-error)
+# Compiler options
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os)
 
-# C++ standard
+# C++ standard (C++14 to avoid ESP-IDF macro test failures with C++17)
 set_target_properties(
   ${COMPONENT_LIB}
-  PROPERTIES CXX_STANDARD 17
+  PROPERTIES CXX_STANDARD 14
              CXX_STANDARD_REQUIRED ON
              CXX_EXTENSIONS OFF)
 
