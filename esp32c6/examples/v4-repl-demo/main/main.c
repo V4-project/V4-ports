@@ -30,7 +30,6 @@
 #define LED_GPIO 7  // GPIO7 for LED
 
 static uint8_t arena_buf[ARENA_SIZE];
-static int led_state = 0;  // Track LED state for toggle
 
 /**
  * @brief Print welcome banner
@@ -52,40 +51,7 @@ static void print_banner(void)
 }
 
 /**
- * @brief LED on - Native Forth word
- * Stack effect: ( -- )
- */
-static int led_on_impl(struct Vm *vm)
-{
-  hal_gpio_write(LED_GPIO, HAL_GPIO_HIGH);
-  led_state = 1;
-  return 0;
-}
-
-/**
- * @brief LED off - Native Forth word
- * Stack effect: ( -- )
- */
-static int led_off_impl(struct Vm *vm)
-{
-  hal_gpio_write(LED_GPIO, HAL_GPIO_LOW);
-  led_state = 0;
-  return 0;
-}
-
-/**
- * @brief LED toggle - Native Forth word
- * Stack effect: ( -- )
- */
-static int led_toggle_impl(struct Vm *vm)
-{
-  led_state = !led_state;
-  hal_gpio_write(LED_GPIO, led_state ? HAL_GPIO_HIGH : HAL_GPIO_LOW);
-  return 0;
-}
-
-/**
- * @brief Set LED state - Native Forth word
+ * @brief Set LED state - Native Forth word for "n led!" syntax
  * Stack effect: ( n -- )
  * Takes 0 or non-zero value from stack
  */
@@ -98,8 +64,8 @@ static int led_set_impl(struct Vm *vm)
     return err;
   }
 
-  led_state = (value != 0) ? 1 : 0;
-  hal_gpio_write(LED_GPIO, led_state ? HAL_GPIO_HIGH : HAL_GPIO_LOW);
+  // Set LED based on value (0=off, non-zero=on)
+  hal_gpio_write(LED_GPIO, (value != 0) ? HAL_GPIO_HIGH : HAL_GPIO_LOW);
   return 0;
 }
 
@@ -355,10 +321,16 @@ void app_main(void)
       0x51             // RET
   };
 
-  // led-toggle: led_state not led_state ! 7 led_state 0x01 SYS RET
-  // For simplicity, we'll keep using C implementation via handle_led_word
+  // led-toggle: Read current GPIO state, invert it, and write back
+  // Bytecode: 7 0x02 SYS (GPIO_READ) -> NOT -> 7 SWAP -> 0x01 SYS (GPIO_WRITE) -> RET
   static uint8_t led_toggle_code[] = {
-      0x51  // RET (handled by handle_led_word)
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number)
+      0x60, 0x02,      // SYS 0x02 (V4_SYS_GPIO_READ) - reads pin state to stack
+      0x2B,            // INVERT (bitwise NOT)
+      0x76, LED_GPIO,  // LIT_U8 7 (GPIO pin number again)
+      0x03,            // SWAP (pin, inverted_value)
+      0x60, 0x01,      // SYS 0x01 (V4_SYS_GPIO_WRITE)
+      0x51             // RET
   };
 
   int wid_on = vm_register_word(vm, "led-on", led_on_code, sizeof(led_on_code));
