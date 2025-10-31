@@ -13,7 +13,9 @@
 #define PROJECT_CONFIG_H
 
 // Define ESP_STATIC_ASSERT as empty to skip esp_macros.h self-tests
-// ESP-IDF headers (esp_assert.h) will redefine this later, which is OK
+// Use #ifndef to avoid redefinition warnings
+#ifndef ESP_STATIC_ASSERT
 #define ESP_STATIC_ASSERT(condition, message)
+#endif
 
 #endif  // PROJECT_CONFIG_H

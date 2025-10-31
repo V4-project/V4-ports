@@ -11,5 +11,5 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(v4-link-demo)
 
 # Force-include project config header globally to disable ESP-IDF macro tests
-idf_build_set_property(COMPILE_OPTIONS
-                       "-include;${CMAKE_CURRENT_LIST_DIR}/project_config.h;-Wno-error=macro-redefined" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-include;${CMAKE_CURRENT_LIST_DIR}/project_config.h"
+                       APPEND)
