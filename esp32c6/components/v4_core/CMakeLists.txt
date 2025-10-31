@@ -37,6 +37,10 @@ idf_component_register(
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os # Optimize for size
 )
 
+# Force-include config header to disable ESP-IDF macro self-tests
+target_compile_options(${COMPONENT_LIB}
+                       PRIVATE -include ${CMAKE_CURRENT_LIST_DIR}/v4_core_config.h)
+
 # C++ standard and options
 set_target_properties(
   ${COMPONENT_LIB}

@@ -69,6 +69,10 @@ target_compile_definitions(
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os # Optimize for size
 )
 
+# Force-include config header to disable ESP-IDF macro self-tests
+target_compile_options(${COMPONENT_LIB}
+                       PRIVATE -include ${CMAKE_CURRENT_LIST_DIR}/v4_front_config.h)
+
 # Remove -Werror flags added by ESP-IDF (must be done AFTER setting standard flags)
 get_target_property(COMPILE_OPTIONS ${COMPONENT_LIB} COMPILE_OPTIONS)
 list(FILTER COMPILE_OPTIONS EXCLUDE REGEX "-Werror")
