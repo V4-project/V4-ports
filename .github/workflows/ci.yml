@@ -11,7 +11,7 @@ jobs:
     name: Build ESP32-C6 Examples
     runs-on: ubuntu-latest
     container:
-      image: espressif/idf:v5.3
+      image: espressif/idf:v5.5
 
     steps:
       - name: Checkout V4-ports
