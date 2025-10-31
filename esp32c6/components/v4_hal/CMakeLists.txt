@@ -56,6 +56,10 @@ target_compile_options(
   ${COMPONENT_LIB} PRIVATE -Wall -Wextra -Werror=implicit-function-declaration
                            -fno-exceptions -fno-rtti)
 
+# Force-include config header to disable ESP-IDF macro self-tests
+target_compile_options(${COMPONENT_LIB} PRIVATE -include
+                                                ${CMAKE_CURRENT_LIST_DIR}/v4_hal_config.h)
+
 # C++ standard
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD_REQUIRED ON)
