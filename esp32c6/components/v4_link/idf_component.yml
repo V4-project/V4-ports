@@ -18,7 +18,7 @@ maintainers:
   - Akihito Kirisaki <kirisaki@example.com>
 
 tags:
-  - vm
+  - v4vm
   - bytecode
   - forth
   - embedded
