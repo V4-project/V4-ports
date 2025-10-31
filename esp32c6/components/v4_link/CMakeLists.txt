@@ -43,6 +43,9 @@ idf_component_register(
 # Compiler options
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os)
 
+# Disable ESP-IDF macro self-tests (incompatible with some GCC versions)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE "ESP_STATIC_ASSERT(condition,message)=")
+
 # C++ standard (C++14 to avoid ESP-IDF macro test failures with C++17)
 set_target_properties(
   ${COMPONENT_LIB}

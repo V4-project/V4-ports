@@ -6,12 +6,7 @@
  * @license Dual-licensed under MIT or Apache-2.0
  */
 
-// Disable ESP-IDF macro self-tests before including headers
-#define ESP_STATIC_ASSERT(condition, message)
-
 #include "v4_link_port.hpp"
-
-#undef ESP_STATIC_ASSERT
 
 #include <cassert>
 
