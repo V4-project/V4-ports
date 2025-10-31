@@ -43,6 +43,9 @@ idf_component_register(
 # Compiler options
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os) # Optimize for size
 
+# Disable ESP-IDF macro tests (incompatible with C++17)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE ESP_SUPPRESS_MACRO_WARNINGS)
+
 # C++ standard
 set_target_properties(
   ${COMPONENT_LIB}
