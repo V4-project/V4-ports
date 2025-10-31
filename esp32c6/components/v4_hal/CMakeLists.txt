@@ -9,8 +9,16 @@ elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../../V4-hal")
   set(V4_HAL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../V4-hal")
   message(STATUS "V4-hal found at: ${V4_HAL_DIR}")
 else()
-  message(
-    FATAL_ERROR "V4-hal not found. Set V4_HAL_PATH or place V4-hal at parent directory")
+  # Fetch from GitHub if not found locally
+  include(FetchContent)
+  message(STATUS "V4-hal not found locally, fetching from GitHub...")
+  FetchContent_Declare(
+    v4_hal_src
+    GIT_REPOSITORY https://github.com/V4-project/V4-hal.git
+    GIT_TAG main)
+  FetchContent_MakeAvailable(v4_hal_src)
+  set(V4_HAL_DIR "${v4_hal_src_SOURCE_DIR}")
+  message(STATUS "V4-hal fetched to: ${V4_HAL_DIR}")
 endif()
 
 # V4-hal source files

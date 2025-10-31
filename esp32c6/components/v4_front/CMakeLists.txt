@@ -8,9 +8,16 @@ elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../V4-front")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../v4-front")
   set(V4_FRONT_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../v4-front")
 else()
-  message(
-    FATAL_ERROR
-      "V4-front not found. Set V4_FRONT_PATH or place V4-front at ../../../v4-front")
+  # Fetch from GitHub if not found locally
+  include(FetchContent)
+  message(STATUS "V4-front not found locally, fetching from GitHub...")
+  FetchContent_Declare(
+    v4_front_src
+    GIT_REPOSITORY https://github.com/V4-project/V4-front.git
+    GIT_TAG main)
+  FetchContent_MakeAvailable(v4_front_src)
+  set(V4_FRONT_DIR "${v4_front_src_SOURCE_DIR}")
+  message(STATUS "V4-front fetched to: ${V4_FRONT_DIR}")
 endif()
 
 # Detect V4 path (needed for V4 headers)
@@ -21,7 +28,16 @@ elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../V4")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../v4")
   set(V4_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../v4")
 else()
-  message(FATAL_ERROR "V4 not found. Set V4_PATH or place V4 at ../../../v4")
+  # Fetch from GitHub if not found locally
+  include(FetchContent)
+  message(STATUS "V4 not found locally, fetching from GitHub...")
+  FetchContent_Declare(
+    v4_src
+    GIT_REPOSITORY https://github.com/V4-project/V4.git
+    GIT_TAG main)
+  FetchContent_MakeAvailable(v4_src)
+  set(V4_DIR "${v4_src_SOURCE_DIR}")
+  message(STATUS "V4 fetched to: ${V4_DIR}")
 endif()
 
 message(STATUS "V4-front using V4-front directory: ${V4_FRONT_DIR}")
