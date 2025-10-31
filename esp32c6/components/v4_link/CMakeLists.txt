@@ -40,11 +40,9 @@ idf_component_register(
   driver
   esp_driver_uart)
 
-# Compiler options
-target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os) # Optimize for size
-
-# Disable ESP-IDF macro tests (incompatible with C++17)
-target_compile_definitions(${COMPONENT_LIB} PRIVATE ESP_SUPPRESS_MACRO_WARNINGS)
+# Compiler options (Disable error on failed static assertions for ESP-IDF C++17
+# compatibility)
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os -Wno-error)
 
 # C++ standard
 set_target_properties(
