@@ -138,6 +138,33 @@ v4> 7 SQUARE
 v4>
 ```
 
+#### 3. v4-link-demo
+
+Bytecode transfer via V4-link protocol over USB Serial/JTAG.
+
+```bash
+cd esp32c6/examples/v4-link-demo
+idf.py build flash monitor
+```
+
+**Features**:
+- Frame-based bytecode transfer protocol
+- CRC-8 error detection
+- Commands: EXEC, PING, RESET
+- Non-blocking UART communication
+- 512B bytecode buffer, 4KB VM memory
+
+**Protocol**:
+```
+Frame: [STX(0xA5)][LEN_L][LEN_H][CMD][DATA...][CRC8]
+```
+
+**Usage**:
+- Send compiled bytecode from host PC
+- Executes bytecode on V4 VM
+- Suitable for remote code deployment
+- See `esp32c6/examples/v4-link-demo/README.md` for Python host script example
+
 ## HAL API Implementation
 
 The ESP32-C6 port implements the following V4 HAL APIs:
@@ -170,18 +197,24 @@ The ESP32-C6 port implements the following V4 HAL APIs:
 v4-ports/
 ├── esp32c6/                    # ESP32-C6 port
 │   ├── components/
-│   │   └── v4_hal_esp32c6/    # HAL implementation
+│   │   ├── v4_hal_esp32c6/    # HAL implementation
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── include/
+│   │   │   │   └── v4_hal_esp32c6.h
+│   │   │   └── src/
+│   │   │       ├── hal_gpio.c
+│   │   │       ├── hal_uart.c
+│   │   │       ├── hal_timer.c
+│   │   │       └── hal_system.c
+│   │   └── v4_link/           # V4-link bytecode transfer
 │   │       ├── CMakeLists.txt
-│   │       ├── include/
-│   │       │   └── v4_hal_esp32c6.h
-│   │       └── src/
-│   │           ├── hal_gpio.c
-│   │           ├── hal_uart.c
-│   │           ├── hal_timer.c
-│   │           └── hal_system.c
+│   │       ├── idf_component.yml
+│   │       ├── v4_link_port.hpp
+│   │       └── v4_link_port.cpp
 │   └── examples/
 │       ├── v4-blink/          # LED blink example
-│       └── v4-repl-demo/      # REPL example
+│       ├── v4-repl-demo/      # REPL example
+│       └── v4-link-demo/      # Bytecode transfer example
 ├── .github/
 │   └── workflows/
 │       └── ci.yml             # GitHub Actions CI
@@ -307,6 +340,7 @@ You may choose either license for your use.
 - [V4](https://github.com/kirisaki/v4) - VM core implementation
 - [V4-front](https://github.com/kirisaki/v4-front) - Forth compiler frontend
 - [V4-repl](https://github.com/kirisaki/v4-repl) - Interactive REPL
+- [V4-link](https://github.com/V4-project/V4-link) - Bytecode transfer protocol
 
 ---
 
