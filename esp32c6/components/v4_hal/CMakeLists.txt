@@ -60,9 +60,10 @@ target_compile_options(
 target_compile_options(${COMPONENT_LIB} PRIVATE -include
                                                 ${CMAKE_CURRENT_LIST_DIR}/v4_hal_config.h)
 
-# C++ standard
+# C++ standard (using GNU extensions to fix ESP-IDF macro issues)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_EXTENSIONS ON)
 
 # Component version
 set(V4_HAL_VERSION "0.2.0")

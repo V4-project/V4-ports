@@ -46,7 +46,7 @@ set_target_properties(
   ${COMPONENT_LIB}
   PROPERTIES CXX_STANDARD 17
              CXX_STANDARD_REQUIRED ON
-             CXX_EXTENSIONS OFF)
+             CXX_EXTENSIONS ON)
 
 # Disable C++ features that may cause initialization issues
 target_compile_options(

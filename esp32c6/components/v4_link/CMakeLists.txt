@@ -47,12 +47,12 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os)
 target_compile_options(${COMPONENT_LIB}
                        PRIVATE -include ${CMAKE_CURRENT_LIST_DIR}/v4_link_config.h)
 
-# C++ standard (C++14 to avoid ESP-IDF macro test failures with C++17)
+# C++ standard (using GNU extensions to fix ESP-IDF macro issues)
 set_target_properties(
   ${COMPONENT_LIB}
-  PROPERTIES CXX_STANDARD 14
+  PROPERTIES CXX_STANDARD 17
              CXX_STANDARD_REQUIRED ON
-             CXX_EXTENSIONS OFF)
+             CXX_EXTENSIONS ON)
 
 # Disable C++ features for embedded (no exceptions, no RTTI)
 target_compile_options(
