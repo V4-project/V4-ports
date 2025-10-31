@@ -40,6 +40,13 @@ jobs:
           path: v4-repl
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout V4-hal
+        uses: actions/checkout@v4
+        with:
+          repository: kirisaki/V4-hal
+          path: v4-hal
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup environment
         run: |
           . $IDF_PATH/export.sh
@@ -53,9 +60,11 @@ jobs:
           export V4_PATH=$GITHUB_WORKSPACE/v4
           export V4_FRONT_PATH=$GITHUB_WORKSPACE/v4-front
           export V4_REPL_PATH=$GITHUB_WORKSPACE/v4-repl
+          export V4_HAL_PATH=$GITHUB_WORKSPACE/v4-hal
           echo "V4_PATH is set to: $V4_PATH"
           echo "V4_FRONT_PATH is set to: $V4_FRONT_PATH"
           echo "V4_REPL_PATH is set to: $V4_REPL_PATH"
+          echo "V4_HAL_PATH is set to: $V4_HAL_PATH"
           ls -la $V4_PATH/include/v4/ || echo "V4 headers not found"
           idf.py build
 
