@@ -12,11 +12,8 @@
 #ifndef PROJECT_CONFIG_H
 #define PROJECT_CONFIG_H
 
-// Disable macro redefinition warnings (ESP-IDF headers redefine ESP_STATIC_ASSERT)
-#pragma GCC diagnostic ignored "-Wmacro-redefined"
-
 // Define ESP_STATIC_ASSERT as empty to skip esp_macros.h self-tests
-// (will be redefined by esp_assert.h, hence the pragma above)
+// ESP-IDF headers (esp_assert.h) will redefine this later, which is OK
 #define ESP_STATIC_ASSERT(condition, message)
 
 #endif  // PROJECT_CONFIG_H
