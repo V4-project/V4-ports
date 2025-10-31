@@ -1,5 +1,5 @@
-# V4 HAL Component for ESP-IDF
-# This component wraps V4-hal library for use in ESP-IDF projects
+# V4 HAL Component for ESP-IDF This component wraps V4-hal library for use in ESP-IDF
+# projects
 
 # Find V4-hal directory
 if(DEFINED ENV{V4_HAL_PATH})
@@ -9,7 +9,8 @@ elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../../../V4-hal")
   set(V4_HAL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../V4-hal")
   message(STATUS "V4-hal found at: ${V4_HAL_DIR}")
 else()
-  message(FATAL_ERROR "V4-hal not found. Set V4_HAL_PATH or place V4-hal at parent directory")
+  message(
+    FATAL_ERROR "V4-hal not found. Set V4_HAL_PATH or place V4-hal at parent directory")
 endif()
 
 # V4-hal source files
@@ -42,12 +43,8 @@ target_compile_definitions(${COMPONENT_LIB}
 
 # Compiler options
 target_compile_options(
-  ${COMPONENT_LIB}
-  PRIVATE -Wall
-          -Wextra
-          -Werror=implicit-function-declaration
-          -fno-exceptions
-          -fno-rtti)
+  ${COMPONENT_LIB} PRIVATE -Wall -Wextra -Werror=implicit-function-declaration
+                           -fno-exceptions -fno-rtti)
 
 # C++ standard
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)

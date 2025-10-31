@@ -10,6 +10,8 @@ services:
       - .:/project
       # Mount V4 (required for HAL headers)
       - ../V4:/v4:ro
+      # Mount V4-hal (required for HAL implementation)
+      - ../V4-hal:/v4-hal:ro
       # Mount V4-front (required for REPL example)
       - ../V4-front:/v4-front:ro
       # Mount V4-repl (required for REPL example)
@@ -21,6 +23,7 @@ services:
     environment:
       # Set V4 path for build system
       - V4_PATH=/v4
+      - V4_HAL_PATH=/v4-hal
       - V4_FRONT_PATH=/v4-front
       - V4_REPL_PATH=/v4-repl
     working_dir: /project
