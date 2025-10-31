@@ -15,7 +15,7 @@
 #include "esp_vfs_dev.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "v4/v4_hal.h"
+#include "v4/hal.h"
 #include "v4/vm_api.h"
 #include "v4front/compile.h"
 
@@ -46,7 +46,7 @@ static void print_banner(void)
   printf("Arena: %d bytes\n", ARENA_SIZE);
   printf("Stack: 16KB (optimized via v4_front)\n");
   printf("Console: USB Serial/JTAG\n");
-  printf("System: %s\n", v4_hal_system_info());
+  printf("System: ESP32-C6 with V4-hal\n");  // TODO: Add system_info to HAL API
   printf("LED: GPIO%d\n", LED_GPIO);
   printf("========================================\n\n");
 }
@@ -55,9 +55,9 @@ static void print_banner(void)
  * @brief LED on - Native Forth word
  * Stack effect: ( -- )
  */
-static v4_err led_on_impl(struct Vm *vm)
+static int led_on_impl(struct Vm *vm)
 {
-  v4_hal_gpio_write(LED_GPIO, 1);
+  hal_gpio_write(LED_GPIO, HAL_GPIO_HIGH);
   led_state = 1;
   return 0;
 }
@@ -66,9 +66,9 @@ static v4_err led_on_impl(struct Vm *vm)
  * @brief LED off - Native Forth word
  * Stack effect: ( -- )
  */
-static v4_err led_off_impl(struct Vm *vm)
+static int led_off_impl(struct Vm *vm)
 {
-  v4_hal_gpio_write(LED_GPIO, 0);
+  hal_gpio_write(LED_GPIO, HAL_GPIO_LOW);
   led_state = 0;
   return 0;
 }
@@ -77,10 +77,10 @@ static v4_err led_off_impl(struct Vm *vm)
  * @brief LED toggle - Native Forth word
  * Stack effect: ( -- )
  */
-static v4_err led_toggle_impl(struct Vm *vm)
+static int led_toggle_impl(struct Vm *vm)
 {
   led_state = !led_state;
-  v4_hal_gpio_write(LED_GPIO, led_state);
+  hal_gpio_write(LED_GPIO, led_state ? HAL_GPIO_HIGH : HAL_GPIO_LOW);
   return 0;
 }
 
@@ -89,17 +89,17 @@ static v4_err led_toggle_impl(struct Vm *vm)
  * Stack effect: ( n -- )
  * Takes 0 or non-zero value from stack
  */
-static v4_err led_set_impl(struct Vm *vm)
+static int led_set_impl(struct Vm *vm)
 {
   v4_i32 value;
-  v4_err err = vm_ds_pop(vm, &value);
+  int err = vm_ds_pop(vm, &value);
   if (err != 0)
   {
     return err;
   }
 
   led_state = (value != 0) ? 1 : 0;
-  v4_hal_gpio_write(LED_GPIO, led_state);
+  hal_gpio_write(LED_GPIO, led_state ? HAL_GPIO_HIGH : HAL_GPIO_LOW);
   return 0;
 }
 
@@ -313,7 +313,7 @@ void app_main(void)
   printf("VM created successfully\n");
 
   // Initialize LED GPIO
-  v4_err gpio_err = v4_hal_gpio_init(LED_GPIO, V4_HAL_GPIO_MODE_OUTPUT);
+  int gpio_err = hal_gpio_mode(LED_GPIO, HAL_GPIO_OUTPUT);
   if (gpio_err != 0)
   {
     printf("ERROR: Failed to initialize LED GPIO%d\n", LED_GPIO);
@@ -321,7 +321,7 @@ void app_main(void)
   else
   {
     // Turn off LED initially
-    v4_hal_gpio_write(LED_GPIO, 0);
+    hal_gpio_write(LED_GPIO, HAL_GPIO_LOW);
     printf("LED GPIO%d initialized\n", LED_GPIO);
   }
 
