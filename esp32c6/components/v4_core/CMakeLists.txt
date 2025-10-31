@@ -22,7 +22,7 @@ idf_component_register(
   INCLUDE_DIRS
   "${V4_DIR}/include"
   REQUIRES
-  v4_hal_esp32c6)
+  v4_hal)
 
 # Compiler options for V4
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os # Optimize for size

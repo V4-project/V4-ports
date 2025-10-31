@@ -9,7 +9,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "v4/v4_hal.h"
+#include "v4/hal.h"
 
 // LED pin configuration for ESP32-C6
 // GPIO7: Simple on-board LED (can be controlled with standard GPIO)
@@ -27,11 +27,10 @@ void app_main(void)
   printf("========================================\n");
   printf("LED Pin: GPIO%d\n", LED_PIN);
   printf("Blink Interval: %d ms\n", BLINK_INTERVAL_MS);
-  printf("System: %s\n", v4_hal_system_info());
   printf("========================================\n\n");
 
   // Initialize GPIO pin for LED output
-  v4_err err = v4_hal_gpio_init(LED_PIN, V4_HAL_GPIO_MODE_OUTPUT);
+  int err = hal_gpio_mode(LED_PIN, HAL_GPIO_OUTPUT);
   if (err != 0)
   {
     printf("ERROR: Failed to initialize GPIO%d (error code: %d)\n", LED_PIN, err);
@@ -47,14 +46,14 @@ void app_main(void)
   while (1)
   {
     // Toggle LED state
-    err = v4_hal_gpio_write(LED_PIN, state);
+    err = hal_gpio_write(LED_PIN, state);
     if (err != 0)
     {
       printf("ERROR: Failed to write GPIO%d\n", LED_PIN);
     }
 
     // Get current time
-    uint32_t current_ms = v4_hal_millis();
+    uint32_t current_ms = hal_millis();
 
     // Print status
     printf("[%6" PRIu32 "] LED %s | Time: %" PRIu32 " ms\n", loop_count,
@@ -65,6 +64,6 @@ void app_main(void)
     loop_count++;
 
     // Wait before next toggle
-    v4_hal_delay_ms(BLINK_INTERVAL_MS);
+    hal_delay_ms(BLINK_INTERVAL_MS);
   }
 }

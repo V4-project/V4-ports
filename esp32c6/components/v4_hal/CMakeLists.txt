@@ -32,6 +32,8 @@ idf_component_register(
   "${V4_HAL_DIR}/ports/esp32"
   PRIV_REQUIRES
   driver
+  esp_driver_gpio
+  esp_driver_uart
   esp_timer)
 
 # Define HAL platform
