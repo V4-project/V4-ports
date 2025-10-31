@@ -10,9 +10,8 @@ CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
 CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
 
 # USB Serial/JTAG Console (for ESP32-C6)
-# Enable USB Serial/JTAG but manually manage driver for non-blocking I/O
+# Enable USB Serial/JTAG as primary console for stdin/stdout
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
-CONFIG_ESP_CONSOLE_UART_NONE=y
 
 # USB Serial/JTAG secondary console for logging during init
 CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y
