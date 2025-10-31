@@ -12,4 +12,4 @@ project(v4-blink)
 
 # Force-include project config header globally to disable ESP-IDF macro tests
 idf_build_set_property(COMPILE_OPTIONS
-                       "-include;${CMAKE_CURRENT_LIST_DIR}/project_config.h" APPEND)
+                       "-include;${CMAKE_CURRENT_LIST_DIR}/project_config.h;-Wno-error=macro-redefined" APPEND)
