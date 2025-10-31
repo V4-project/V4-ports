@@ -62,6 +62,31 @@ I (xxx) v4_link_demo: Waiting for bytecode from host...
 
 ## Using V4-link
 
+### Quick Start with Host Scripts
+
+Python scripts are provided in the `host/` directory for easy bytecode deployment:
+
+```bash
+# Setup
+cd host
+pip install -r requirements.txt
+
+# Generate example bytecode (arithmetic + LED control)
+python generate_examples.py
+
+# Test connection
+python v4_link_send.py --port /dev/ttyACM0 --ping
+
+# Execute arithmetic bytecode
+python v4_link_send.py --port /dev/ttyACM0 --exec examples/add.bin
+
+# Execute LED control bytecode (blink GPIO7 on NanoC6)
+python v4_link_send.py --port /dev/ttyACM0 --exec examples/led_blink.bin
+python v4_link_send.py --port /dev/ttyACM0 --exec examples/led_sos.bin
+```
+
+See `host/README.md` for detailed usage, more examples, and custom bytecode instructions.
+
 ### Protocol Overview
 
 V4-link uses a simple frame-based protocol:
@@ -78,20 +103,13 @@ Frame: [STX(0xA5)][LEN_L][LEN_H][CMD][DATA...][CRC8]
 **Response:**
 - `[STX][0x00][0x01][ERR_CODE][CRC8]`
 
-### Sending Bytecode (Manual)
+### Manual Protocol Details
 
-For testing, you can use a serial terminal to send raw frames. However, it's recommended to use the V4-cli tool (future release) or write a simple host script.
+The provided Python scripts (`host/v4_link_send.py`) handle all protocol details automatically. For advanced use cases or custom implementations, here's the low-level protocol:
 
-### Example: Python Host Script
-
+**Frame encoding example:**
 ```python
-#!/usr/bin/env python3
-import serial
 import struct
-
-STX = 0xA5
-CMD_EXEC = 0x10
-CMD_PING = 0x20
 
 def calc_crc8(data):
     crc = 0x00
@@ -106,29 +124,23 @@ def calc_crc8(data):
     return crc
 
 def encode_frame(cmd, payload=b''):
+    STX = 0xA5
     length = len(payload)
-    frame = struct.pack('<BBBH', STX, length & 0xFF, (length >> 8) & 0xFF, cmd)
+    frame = struct.pack('<BBH', STX, length & 0xFF, (length >> 8) & 0xFF)
+    frame += struct.pack('<B', cmd)
     frame += payload
     crc = calc_crc8(frame[1:])
     frame += bytes([crc])
     return frame
 
-# Connect to ESP32-C6
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+# Example: PING command
+ping_frame = encode_frame(0x20)  # CMD_PING
+# Result: a500000020a7
 
-# Send PING
-ping_frame = encode_frame(CMD_PING)
-ser.write(ping_frame)
-response = ser.read(5)
-print(f"PING response: {response.hex()}")
-
-# Example bytecode: LIT 42 (push 42 to stack)
-# Op::LIT=0x00, followed by 4-byte little-endian value
-bytecode = bytes([0x00, 42, 0x00, 0x00, 0x00, 0x51])  # LIT 42, RET
-exec_frame = encode_frame(CMD_EXEC, bytecode)
-ser.write(exec_frame)
-response = ser.read(5)
-print(f"EXEC response: {response.hex()}")
+# Example: Execute bytecode (LIT 42, RET)
+bytecode = bytes([0x00, 42, 0x00, 0x00, 0x00, 0x51])
+exec_frame = encode_frame(0x10, bytecode)  # CMD_EXEC
+# Result: a5060000102a0000005163
 ```
 
 ## Memory Map
