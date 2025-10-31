@@ -47,6 +47,13 @@ jobs:
           path: v4-hal
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout V4-link
+        uses: actions/checkout@v4
+        with:
+          repository: V4-project/V4-link
+          path: v4-link
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup environment
         run: |
           . $IDF_PATH/export.sh
@@ -61,10 +68,12 @@ jobs:
           export V4_FRONT_PATH=$GITHUB_WORKSPACE/v4-front
           export V4_REPL_PATH=$GITHUB_WORKSPACE/v4-repl
           export V4_HAL_PATH=$GITHUB_WORKSPACE/v4-hal
+          export V4_LINK_PATH=$GITHUB_WORKSPACE/v4-link
           echo "V4_PATH is set to: $V4_PATH"
           echo "V4_FRONT_PATH is set to: $V4_FRONT_PATH"
           echo "V4_REPL_PATH is set to: $V4_REPL_PATH"
           echo "V4_HAL_PATH is set to: $V4_HAL_PATH"
+          echo "V4_LINK_PATH is set to: $V4_LINK_PATH"
           ls -la $V4_PATH/include/v4/ || echo "V4 headers not found"
           idf.py build
 
@@ -78,6 +87,18 @@ jobs:
       #     export V4_FRONT_PATH=$GITHUB_WORKSPACE/v4-front
       #     idf.py build
 
+      - name: Build v4-link-demo
+        working-directory: v4-ports/esp32c6/examples/v4-link-demo
+        run: |
+          . $IDF_PATH/export.sh
+          export V4_PATH=$GITHUB_WORKSPACE/v4
+          export V4_HAL_PATH=$GITHUB_WORKSPACE/v4-hal
+          export V4_LINK_PATH=$GITHUB_WORKSPACE/v4-link
+          echo "V4_PATH is set to: $V4_PATH"
+          echo "V4_HAL_PATH is set to: $V4_HAL_PATH"
+          echo "V4_LINK_PATH is set to: $V4_LINK_PATH"
+          idf.py build
+
       - name: Upload v4-blink artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -85,6 +106,15 @@ jobs:
           path: |
             v4-ports/esp32c6/examples/v4-blink/build/*.bin
             v4-ports/esp32c6/examples/v4-blink/build/*.elf
+          retention-days: 7
+
+      - name: Upload v4-link-demo artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: v4-link-demo-esp32c6
+          path: |
+            v4-ports/esp32c6/examples/v4-link-demo/build/*.bin
+            v4-ports/esp32c6/examples/v4-link-demo/build/*.elf
           retention-days: 7
 
       # - name: Upload v4-repl-demo artifacts
