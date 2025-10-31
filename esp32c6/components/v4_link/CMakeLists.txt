@@ -41,8 +41,7 @@ idf_component_register(
   esp_driver_uart)
 
 # Compiler options
-target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os # Optimize for size
-                                                -fno-exceptions -fno-rtti)
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Os) # Optimize for size
 
 # C++ standard
 set_target_properties(
@@ -51,10 +50,12 @@ set_target_properties(
              CXX_STANDARD_REQUIRED ON
              CXX_EXTENSIONS OFF)
 
-# Disable C++ features for embedded
+# Disable C++ features for embedded (no exceptions, no RTTI)
 target_compile_options(
-  ${COMPONENT_LIB} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
-                           $<$<COMPILE_LANGUAGE:CXX>:-fno-use-cxa-atexit>)
+  ${COMPONENT_LIB}
+  PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions> $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
+          $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
+          $<$<COMPILE_LANGUAGE:CXX>:-fno-use-cxa-atexit>)
 
 target_link_options(${COMPONENT_LIB} PRIVATE -fno-exceptions -fno-rtti)
 
