@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-01
+
+### Added
+- V4-hal library integration for ESP32-C6 port
+- CI workflow updates for V4-hal dependency checkout
+
+### Changed
+- Migrated ESP32-C6 port to use V4-hal library
+- Updated v4-repl-demo to use new HAL API
+- Component name updated from v4_hal_esp32c6 to v4_hal
+
+### Fixed
+- USB Serial/JTAG console for stdin in v4-repl-demo
+- CI environment variables for build paths
+
 ## [0.1.0] - 2025-10-29
 
 ### Added
@@ -25,4 +40,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Project structure initialized with proper documentation
 
+[0.2.0]: https://github.com/kirisaki/V4-ports/releases/tag/v0.2.0
 [0.1.0]: https://github.com/kirisaki/V4-ports/releases/tag/v0.1.0
