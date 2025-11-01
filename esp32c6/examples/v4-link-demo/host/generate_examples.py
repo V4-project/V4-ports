@@ -36,7 +36,7 @@ SYS_DELAY_MS = 0x22
 
 # GPIO constants
 GPIO_LED = 7  # NanoC6 LED on GPIO7
-GPIO_OUTPUT = 1
+GPIO_OUTPUT = 3  # HAL_GPIO_OUTPUT (was incorrectly set to 1 = HAL_GPIO_INPUT_PULLUP)
 GPIO_HIGH = 1
 GPIO_LOW = 0
 
@@ -186,6 +186,185 @@ def main():
 
     bytecode.append(OP_RET)
     write_bytecode("led_blink.bin", bytecode)
+
+    # Example 6b: LED slow blink (1 second interval, 2 times) for clear visibility
+    bytecode = []
+
+    # GPIO_INIT: pin=7, mode=OUTPUT
+    bytecode.extend(
+        [
+            OP_LIT_U8,
+            GPIO_LED,
+            OP_LIT_U8,
+            GPIO_OUTPUT,
+            OP_SYS,
+            SYS_GPIO_INIT,
+            OP_DROP,
+        ]
+    )
+
+    # Blink 2 times with 1 second intervals
+    for _ in range(2):
+        # LED ON
+        bytecode.extend(
+            [
+                OP_LIT_U8,
+                GPIO_LED,
+                OP_LIT_U8,
+                GPIO_HIGH,
+                OP_SYS,
+                SYS_GPIO_WRITE,
+                OP_DROP,
+            ]
+        )
+
+        # Delay 1000ms
+        bytecode.extend(
+            [
+                OP_LIT,
+                232,
+                3,
+                0,
+                0,  # LIT 1000 (0x03E8)
+                OP_SYS,
+                SYS_DELAY_MS,
+            ]
+        )
+
+        # LED OFF
+        bytecode.extend(
+            [
+                OP_LIT_U8,
+                GPIO_LED,
+                OP_LIT_U8,
+                GPIO_LOW,
+                OP_SYS,
+                SYS_GPIO_WRITE,
+                OP_DROP,
+            ]
+        )
+
+        # Delay 1000ms
+        bytecode.extend(
+            [
+                OP_LIT,
+                232,
+                3,
+                0,
+                0,  # LIT 1000
+                OP_SYS,
+                SYS_DELAY_MS,
+            ]
+        )
+
+    bytecode.append(OP_RET)
+    write_bytecode("led_slow.bin", bytecode)
+
+    # Example 6c: LED medium blink (250ms interval using LIT_U8, 2 times)
+    bytecode = []
+
+    # GPIO_INIT: pin=7, mode=OUTPUT
+    bytecode.extend(
+        [
+            OP_LIT_U8,
+            GPIO_LED,
+            OP_LIT_U8,
+            GPIO_OUTPUT,
+            OP_SYS,
+            SYS_GPIO_INIT,
+            OP_DROP,
+        ]
+    )
+
+    # Blink 2 times with 250ms intervals
+    for _ in range(2):
+        # LED ON
+        bytecode.extend(
+            [
+                OP_LIT_U8,
+                GPIO_LED,
+                OP_LIT_U8,
+                GPIO_HIGH,
+                OP_SYS,
+                SYS_GPIO_WRITE,
+                OP_DROP,
+            ]
+        )
+
+        # Delay 250ms (using LIT_U8)
+        bytecode.extend([OP_LIT_U8, 250, OP_SYS, SYS_DELAY_MS])
+
+        # LED OFF
+        bytecode.extend(
+            [
+                OP_LIT_U8,
+                GPIO_LED,
+                OP_LIT_U8,
+                GPIO_LOW,
+                OP_SYS,
+                SYS_GPIO_WRITE,
+                OP_DROP,
+            ]
+        )
+
+        # Delay 250ms
+        bytecode.extend([OP_LIT_U8, 250, OP_SYS, SYS_DELAY_MS])
+
+    bytecode.append(OP_RET)
+    write_bytecode("led_medium.bin", bytecode)
+
+    # Example 6d: Simple LED ON test (no delay, just turn on and return)
+    bytecode = [
+        OP_LIT_U8, GPIO_LED,
+        OP_LIT_U8, GPIO_OUTPUT,
+        OP_SYS, SYS_GPIO_INIT,
+        OP_DROP,
+        OP_LIT_U8, GPIO_LED,
+        OP_LIT_U8, GPIO_HIGH,
+        OP_SYS, SYS_GPIO_WRITE,
+        OP_DROP,
+        OP_RET,
+    ]
+    write_bytecode("led_on.bin", bytecode)
+
+    # Example 6e: Simple LED OFF test
+    bytecode = [
+        OP_LIT_U8, GPIO_LED,
+        OP_LIT_U8, GPIO_OUTPUT,
+        OP_SYS, SYS_GPIO_INIT,
+        OP_DROP,
+        OP_LIT_U8, GPIO_LED,
+        OP_LIT_U8, GPIO_LOW,
+        OP_SYS, SYS_GPIO_WRITE,
+        OP_DROP,
+        OP_RET,
+    ]
+    write_bytecode("led_off.bin", bytecode)
+
+    # Example 6f: Toggle LED 3 times without delay (to test if GPIO control works)
+    bytecode = [
+        OP_LIT_U8, GPIO_LED,
+        OP_LIT_U8, GPIO_OUTPUT,
+        OP_SYS, SYS_GPIO_INIT,
+        OP_DROP,
+    ]
+    for _ in range(3):
+        # LED ON
+        bytecode.extend([
+            OP_LIT_U8, GPIO_LED,
+            OP_LIT_U8, GPIO_HIGH,
+            OP_SYS, SYS_GPIO_WRITE,
+            OP_DROP,
+        ])
+        # LED OFF (no delay)
+        bytecode.extend([
+            OP_LIT_U8, GPIO_LED,
+            OP_LIT_U8, GPIO_LOW,
+            OP_SYS, SYS_GPIO_WRITE,
+            OP_DROP,
+        ])
+    bytecode.append(OP_RET)
+    write_bytecode("led_toggle.bin", bytecode)
 
     # Example 7: LED fast blink (100ms interval, 5 times)
     bytecode = []

@@ -48,15 +48,19 @@ extern "C" void app_main()
   try
   {
     // Initialize V4-link port
-    // Uses USB Serial/JTAG (UART_NUM_0) at 115200 baud
-    v4ports::Esp32c6LinkPort link(vm, UART_NUM_0, 115200, 512);
+    // Uses USB Serial/JTAG
+    v4ports::Esp32c6LinkPort link(vm, 512);
 
-    ESP_LOGI(TAG, "V4-link ready on USB Serial/JTAG (115200 baud)");
+    ESP_LOGI(TAG, "V4-link ready on USB Serial/JTAG");
     ESP_LOGI(TAG, "Buffer capacity: %u bytes", link.buffer_capacity());
     ESP_LOGI(TAG, "");
     ESP_LOGI(TAG, "Waiting for bytecode from host...");
-    ESP_LOGI(TAG, "Use 'idf.py monitor' to see output");
+    ESP_LOGI(TAG, "Reducing log level to ERROR to avoid USB Serial/JTAG conflicts");
     ESP_LOGI(TAG, "");
+
+    // Reduce log level to ERROR to minimize USB Serial/JTAG traffic
+    // This prevents ESP-IDF log output from interfering with V4-link frames
+    esp_log_level_set("*", ESP_LOG_ERROR);
 
     // Main loop: poll for incoming data
     while (true)

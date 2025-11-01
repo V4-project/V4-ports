@@ -12,7 +12,7 @@
 
 #include <memory>
 
-#include "driver/uart.h"
+#include "driver/usb_serial_jtag.h"
 #include "v4/vm_api.h"
 #include "v4link/link.hpp"
 
@@ -48,24 +48,19 @@ class Esp32c6LinkPort
   /**
    * @brief Construct ESP32-C6 link port
    *
-   * Initializes UART and V4-link layer.
+   * Initializes USB Serial/JTAG and V4-link layer.
    *
    * @param vm           Pointer to initialized V4 VM
-   * @param uart_num     UART port number (default: UART_NUM_0)
-   * @param baud_rate    Baud rate (default: 115200)
    * @param buffer_size  Bytecode buffer size (default: 512)
-   * @param tx_pin       TX pin (default: -1, use default pin)
-   * @param rx_pin       RX pin (default: -1, use default pin)
    *
-   * @throws std::runtime_error if UART initialization fails
+   * @throws std::runtime_error if USB Serial/JTAG initialization fails
    */
-  Esp32c6LinkPort(Vm* vm, uart_port_t uart_num = UART_NUM_0, uint32_t baud_rate = 115200,
-                  size_t buffer_size = 512, int tx_pin = -1, int rx_pin = -1);
+  Esp32c6LinkPort(Vm* vm, size_t buffer_size = 512);
 
   /**
    * @brief Destructor
    *
-   * Cleans up UART driver.
+   * Cleans up USB Serial/JTAG driver.
    */
   ~Esp32c6LinkPort();
 
@@ -77,7 +72,7 @@ class Esp32c6LinkPort
    * @brief Poll for incoming data and process
    *
    * Call this from main loop. Non-blocking.
-   * Reads all available UART data and feeds to V4-link.
+   * Reads all available USB Serial/JTAG data and feeds to V4-link.
    */
   void poll();
 
@@ -96,11 +91,9 @@ class Esp32c6LinkPort
   size_t buffer_capacity() const;
 
  private:
-  uart_port_t uart_num_;
   std::unique_ptr<v4::link::Link> link_;
 
-  static constexpr size_t UART_BUF_SIZE = 1024;
-  static constexpr int UART_QUEUE_SIZE = 10;
+  static constexpr size_t USB_BUF_SIZE = 1024;
 };
 
 }  // namespace v4ports

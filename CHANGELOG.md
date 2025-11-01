@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- V4-link protocol implementation for ESP32-C6 (bytecode transfer over USB Serial/JTAG)
+- v4-link-demo example with PING, RESET, and EXEC commands
+- Multiple LED blink pattern examples (slow, medium, fast, on, off, toggle, SOS)
+- V4-link volume mount in docker-compose.yml
+- dependencies.lock to .gitignore (ESP-IDF build artifact)
+
+### Changed
+- Migrated v4-link port from UART to USB Serial/JTAG driver (native USB on ESP32-C6)
+- Simplified Esp32c6LinkPort constructor (no baud rate or pin configuration needed)
+- Increased v4_link_send.py timeout from 2s to 5s for improved reliability
+
+### Fixed
+- **Critical:** GPIO_OUTPUT constant was incorrectly set to 1 (HAL_GPIO_INPUT_PULLUP) instead of 3 (HAL_GPIO_OUTPUT)
+  - This caused GPIO pins to be configured as input with pull-up, resulting in dimly lit LEDs
+  - GPIO control now works correctly with proper brightness
+- Frame encoding in v4_link_send.py (struct.pack format correction)
+- USB Serial/JTAG log interference by reducing log level to ERROR during V4-link operation
+
 ## [0.2.1] - 2025-11-01
 
 ### Fixed

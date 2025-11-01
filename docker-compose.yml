@@ -16,6 +16,8 @@ services:
       - ../V4-front:/v4-front:ro
       # Mount V4-repl (required for REPL example)
       - ../V4-repl:/v4-repl:ro
+      # Mount V4-link (required for link example)
+      - ../V4-link:/v4-link:ro
       # Mount SSH keys for git operations (optional)
       - ~/.ssh:/root/.ssh:ro
       # Persistent build cache
@@ -26,6 +28,7 @@ services:
       - V4_HAL_PATH=/v4-hal
       - V4_FRONT_PATH=/v4-front
       - V4_REPL_PATH=/v4-repl
+      - V4_LINK_PATH=/v4-link
     working_dir: /project
     command: /bin/bash
     tty: true

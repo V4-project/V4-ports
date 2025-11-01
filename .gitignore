@@ -3,6 +3,7 @@ build/
 sdkconfig
 sdkconfig.old
 sdkconfig.defaults.old
+dependencies.lock
 *.bin
 *.elf
 *.map

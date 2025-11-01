@@ -17,86 +17,54 @@ static const char* TAG = "v4_link_port";
 namespace v4ports
 {
 
-Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, uart_port_t uart_num, uint32_t baud_rate,
-                                 size_t buffer_size, int tx_pin, int rx_pin)
-    : uart_num_(uart_num), link_(nullptr)
+Esp32c6LinkPort::Esp32c6LinkPort(Vm* vm, size_t buffer_size) : link_(nullptr)
 {
   // Assert on null VM pointer (programming error)
   assert(vm != nullptr && "VM pointer must not be null");
 
-  // UART configuration
-  uart_config_t uart_config = {
-      .baud_rate = static_cast<int>(baud_rate),
-      .data_bits = UART_DATA_8_BITS,
-      .parity = UART_PARITY_DISABLE,
-      .stop_bits = UART_STOP_BITS_1,
-      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-      .rx_flow_ctrl_thresh = 0,
-      .source_clk = UART_SCLK_DEFAULT,
+  // USB Serial/JTAG configuration
+  usb_serial_jtag_driver_config_t usb_config = {
+      .tx_buffer_size = USB_BUF_SIZE,
+      .rx_buffer_size = USB_BUF_SIZE,
   };
 
-  // Install UART driver
-  esp_err_t ret =
-      uart_driver_install(uart_num_, UART_BUF_SIZE * 2, 0, UART_QUEUE_SIZE, nullptr, 0);
+  // Install USB Serial/JTAG driver
+  esp_err_t ret = usb_serial_jtag_driver_install(&usb_config);
   if (ret != ESP_OK)
   {
-    ESP_LOGE(TAG, "Failed to install UART driver: %s", esp_err_to_name(ret));
+    ESP_LOGE(TAG, "Failed to install USB Serial/JTAG driver: %s", esp_err_to_name(ret));
     abort();
   }
 
-  // Configure UART parameters
-  ret = uart_param_config(uart_num_, &uart_config);
-  if (ret != ESP_OK)
-  {
-    ESP_LOGE(TAG, "Failed to configure UART: %s", esp_err_to_name(ret));
-    uart_driver_delete(uart_num_);
-    abort();
-  }
-
-  // Set UART pins (if specified)
-  if (tx_pin >= 0 || rx_pin >= 0)
-  {
-    ret = uart_set_pin(uart_num_, tx_pin, rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    if (ret != ESP_OK)
-    {
-      ESP_LOGE(TAG, "Failed to set UART pins: %s", esp_err_to_name(ret));
-      uart_driver_delete(uart_num_);
-      abort();
-    }
-  }
-
-  // Create V4-link instance with UART write callback
+  // Create V4-link instance with USB Serial/JTAG write callback
   link_ = std::make_unique<v4::link::Link>(
       vm,
-      [this](const uint8_t* data, size_t len)
+      [](const uint8_t* data, size_t len)
       {
-        // Send data via UART
-        int written = uart_write_bytes(uart_num_, data, len);
+        // Send data via USB Serial/JTAG
+        int written = usb_serial_jtag_write_bytes((const char*)data, len, portMAX_DELAY);
         if (written < 0)
         {
-          ESP_LOGE(TAG, "UART write failed");
+          ESP_LOGE(TAG, "USB Serial/JTAG write failed");
         }
       },
       buffer_size);
 
-  ESP_LOGI(TAG, "V4-link initialized on UART%d at %lu baud", uart_num_, baud_rate);
+  ESP_LOGI(TAG, "V4-link initialized on USB Serial/JTAG");
 }
 
 Esp32c6LinkPort::~Esp32c6LinkPort()
 {
-  if (uart_num_ >= 0)
-  {
-    uart_driver_delete(uart_num_);
-    ESP_LOGI(TAG, "UART%d driver deleted", uart_num_);
-  }
+  usb_serial_jtag_driver_uninstall();
+  ESP_LOGI(TAG, "USB Serial/JTAG driver uninstalled");
 }
 
 void Esp32c6LinkPort::poll()
 {
   uint8_t buffer[128];
 
-  // Read all available data from UART (non-blocking)
-  int len = uart_read_bytes(uart_num_, buffer, sizeof(buffer), 0);
+  // Read all available data from USB Serial/JTAG (non-blocking)
+  int len = usb_serial_jtag_read_bytes(buffer, sizeof(buffer), 0);
 
   if (len > 0)
   {
@@ -105,10 +73,6 @@ void Esp32c6LinkPort::poll()
     {
       link_->feed_byte(buffer[i]);
     }
-  }
-  else if (len < 0)
-  {
-    ESP_LOGW(TAG, "UART read error");
   }
 }
 

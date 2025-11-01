@@ -67,7 +67,7 @@ def encode_frame(cmd, payload=b""):
         raise ValueError(f"Payload too large: {length} bytes (max 512)")
 
     # Frame: [STX][LEN_L][LEN_H][CMD][DATA...][CRC8]
-    frame = struct.pack("<BBH", STX, length & 0xFF, (length >> 8) & 0xFF)
+    frame = struct.pack("<BBB", STX, length & 0xFF, (length >> 8) & 0xFF)
     frame += struct.pack("<B", cmd)
     frame += payload
 
@@ -184,7 +184,7 @@ def main():
     )
     parser.add_argument("--reset", action="store_true", help="Send RESET command")
     parser.add_argument(
-        "-t", "--timeout", type=float, default=2.0, help="Response timeout in seconds"
+        "-t", "--timeout", type=float, default=5.0, help="Response timeout in seconds"
     )
 
     args = parser.parse_args()
