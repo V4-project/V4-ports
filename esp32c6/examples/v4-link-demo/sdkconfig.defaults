@@ -1,5 +1,8 @@
 # ESP32-C6 V4-link Demo Default Configuration
 
+# Target configuration
+CONFIG_IDF_TARGET="esp32c6"
+
 # USB Serial/JTAG for communication
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
 CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
