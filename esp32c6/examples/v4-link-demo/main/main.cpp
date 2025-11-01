@@ -61,6 +61,9 @@ extern "C" void app_main()
     // Reduce log level to ERROR to minimize USB Serial/JTAG traffic
     // This prevents ESP-IDF log output from interfering with V4-link frames
     esp_log_level_set("*", ESP_LOG_ERROR);
+    // Enable INFO logging for V4-link and V4 core for debugging
+    esp_log_level_set("v4_link", ESP_LOG_INFO);
+    esp_log_level_set("v4_link_port", ESP_LOG_INFO);
 
     // Main loop: poll for incoming data
     while (true)

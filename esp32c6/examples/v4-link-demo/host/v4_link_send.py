@@ -127,10 +127,10 @@ def send_command(ser, cmd, payload=b"", timeout=1.0):
     return err_code, None
 
 
-def cmd_ping(ser):
+def cmd_ping(ser, timeout=1.0):
     """Send PING command."""
     print("Sending PING...")
-    err_code, error = send_command(ser, CMD_PING)
+    err_code, error = send_command(ser, CMD_PING, timeout=timeout)
     if error:
         print(f"Error: {error}")
         return False
@@ -140,12 +140,12 @@ def cmd_ping(ser):
     return err_code == ERR_OK
 
 
-def cmd_exec(ser, bytecode):
+def cmd_exec(ser, bytecode, timeout=1.0):
     """Send EXEC command with bytecode."""
     print(f"Sending EXEC with {len(bytecode)} bytes of bytecode...")
     print(f"Bytecode: {bytecode.hex()}")
 
-    err_code, error = send_command(ser, CMD_EXEC, bytecode)
+    err_code, error = send_command(ser, CMD_EXEC, bytecode, timeout=timeout)
     if error:
         print(f"Error: {error}")
         return False
@@ -155,10 +155,10 @@ def cmd_exec(ser, bytecode):
     return err_code == ERR_OK
 
 
-def cmd_reset(ser):
+def cmd_reset(ser, timeout=1.0):
     """Send RESET command."""
     print("Sending RESET...")
-    err_code, error = send_command(ser, CMD_RESET)
+    err_code, error = send_command(ser, CMD_RESET, timeout=timeout)
     if error:
         print(f"Error: {error}")
         return False
@@ -207,7 +207,7 @@ def main():
 
         # Execute commands in order
         if args.ping:
-            if not cmd_ping(ser):
+            if not cmd_ping(ser, timeout=args.timeout):
                 success = False
 
         if args.exec:
@@ -217,11 +217,11 @@ def main():
                 success = False
             else:
                 bytecode = bytecode_path.read_bytes()
-                if not cmd_exec(ser, bytecode):
+                if not cmd_exec(ser, bytecode, timeout=args.timeout):
                     success = False
 
         if args.reset:
-            if not cmd_reset(ser):
+            if not cmd_reset(ser, timeout=args.timeout):
                 success = False
 
         if success:

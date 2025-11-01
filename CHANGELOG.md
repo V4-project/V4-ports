@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - GPIO control now works correctly with proper brightness
 - Frame encoding in v4_link_send.py (struct.pack format correction)
 - USB Serial/JTAG log interference by reducing log level to ERROR during V4-link operation
+- **Critical:** Timeout parameter not propagated in v4_link_send.py
+  - send_command() had hardcoded 1.0s timeout, ignoring the --timeout CLI argument
+  - Bytecode execution >1s (e.g., 6×200ms delays = 1200ms) would timeout
+  - Now properly passes timeout through cmd_ping(), cmd_exec(), and cmd_reset()
 
 ## [0.2.1] - 2025-11-01
 
