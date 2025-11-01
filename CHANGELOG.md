@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-11-01
+
 ### Added
 - V4-link protocol implementation for ESP32-C6 (bytecode transfer over USB Serial/JTAG)
 - v4-link-demo example with PING, RESET, and EXEC commands
@@ -73,6 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Project structure initialized with proper documentation
 
+[Unreleased]: https://github.com/kirisaki/V4-ports/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/kirisaki/V4-ports/compare/v0.1.0...v0.3.0
 [0.2.1]: https://github.com/kirisaki/V4-ports/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kirisaki/V4-ports/releases/tag/v0.2.0
 [0.1.0]: https://github.com/kirisaki/V4-ports/releases/tag/v0.1.0
