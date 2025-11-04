@@ -1,5 +1,9 @@
 # V4-ports
 
+> **⚠️ DEPRECATED**: This repository is being archived and replaced by **[V4-runtime](https://github.com/kirisaki/V4-runtime)**.
+>
+> V4-runtime provides a unified runtime environment with better FreeRTOS integration and improved architecture. Please migrate to V4-runtime for new projects.
+
 Hardware Abstraction Layer (HAL) implementations for V4 VM across various microcontrollers and SoCs.
 
 ## Overview
